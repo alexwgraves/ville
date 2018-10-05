@@ -1,9 +1,54 @@
 body {
   margin: 0;
+  font-family: sans-serif;
 }
 
 canvas {
   width: 100vw;
   height: 100vh;
   display: block;
+}
+
+.brushes {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+}
+
+.brush {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+
+.brush.active {
+  border: 1px solid #000;
+}
+
+.label {
+  margin-top: 2px;
+  margin-left: 30px;
+}
+
+.skyscrapers {
+  background-color: rgba(150, 150, 150, 0.5);
+}
+
+.residential {
+  background-color: rgba(252, 13, 27, 0.5);
+}
+
+.commercial {
+  background-color: rgba(127, 15, 126, 0.5);
+}
+
+.water {
+  background-color: rgba(103, 159, 198, 0.5);
+}
+
+.parks {
+  background-color: rgba(15, 127, 18, 0.5);
 }
