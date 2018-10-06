@@ -11,6 +11,7 @@ this.xClicks = [];
 this.yClicks = [];
 this.dragClicks = [];
 this.clickBrush = [];
+this.clickSize = [];
 
 // brush logic
 this.currentBrush = document.querySelector('.active').classList[1];
@@ -22,21 +23,28 @@ const brushColors = {
   water: 'rgb(180, 207, 226)',
   parks: 'rgb(140, 191, 142)'
 }
+const brushSize = document.getElementById('brush-size');
+const currentBrushSize = document.getElementById('current-brush-size');
+this.currentSize = parseInt(brushSize.value);
 
 /* FUNCTIONS */
 
 const render = () => {
   context.clearRect(0, 0, canvas.width, canvas.height);
   context.lineJoin = 'round';
-  context.lineWidth = 20;
 
-  let brush = this.clickBrush[0] || 'skyscrapers';
-  context.strokeStyle = brushColors[brush];
+  let brush, brushSize;
   for (let i = 0; i < this.xClicks.length; i++) {
     // update brush color if it's different from previous
     if (this.clickBrush[i] !== brush) {
       brush = this.clickBrush[i];
       context.strokeStyle = brushColors[brush];
+    }
+
+    // update brush size if it's different from previous
+    if (this.clickSize[i] !== brushSize) {
+      brushSize = this.clickSize[i];
+      context.lineWidth = brushSize;
     }
 
     context.beginPath();
@@ -57,6 +65,7 @@ const addClick = (x, y, dragging) => {
   this.yClicks.push(y);
   this.dragClicks.push(dragging);
   this.clickBrush.push(this.currentBrush);
+  this.clickSize.push(this.currentSize);
 }
 
 const clearActiveBrushes = () => {
@@ -103,6 +112,11 @@ brushes.forEach(brush => {
     this.currentBrush = brush.classList[1];
     brush.classList.add('active');
   });
+});
+
+brushSize.addEventListener('input', event => {
+  this.currentSize = parseInt(brushSize.value);
+  currentBrushSize.innerText = brushSize.value;
 });
 
 /* MAIN */
