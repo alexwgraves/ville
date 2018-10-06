@@ -1,5 +1,8 @@
 /* SETUP */
 
+const SUPPORTS_POINTER = 'PointerEvent' in window;
+const SUPPORTS_TOUCH = 'ontouchstart' in window;
+
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 canvas.width = window.innerWidth;
@@ -74,6 +77,25 @@ const clearActiveBrushes = () => {
   });
 }
 
+const onEventDown = event => {
+  const mouseX = event.pageX - canvas.offsetLeft;
+  const mouseY = event.pageY - canvas.offsetTop;
+  this.drawing = true;
+  addClick(mouseX, mouseY);
+  render();
+}
+
+const onEventMove = event => {
+  if (this.drawing) {
+    addClick(event.pageX - canvas.offsetLeft, event.pageY - canvas.offsetTop, true);
+    render();
+  }
+}
+
+const onEventUp = event => {
+  this.drawing = false;
+}
+
 /* EVENT LISTENERS */
 
 // update the canvas size on window resize
@@ -83,28 +105,22 @@ window.addEventListener('resize', () => {
   render();
 });
 
-canvas.addEventListener('mousedown', event => {
-  const mouseX = event.pageX - canvas.offsetLeft;
-  const mouseY = event.pageY - canvas.offsetTop;
-  this.drawing = true;
-  addClick(mouseX, mouseY);
-  render();
-});
-
-canvas.addEventListener('mousemove', event => {
-  if (this.drawing) {
-    addClick(event.pageX - canvas.offsetLeft, event.pageY - canvas.offsetTop, true);
-    render();
-  }
-});
-
-canvas.addEventListener('mouseup', event => {
-  this.drawing = false;
-});
-
-canvas.addEventListener('mouseleave', event => {
-  this.drawing = false;
-});
+if (SUPPORTS_POINTER) {
+  canvas.addEventListener('pointerdown', event => { onEventDown(event) });
+  canvas.addEventListener('pointermove', event => { onEventMove(event) });
+  canvas.addEventListener('pointerup', event => { onEventUp(event) });
+  canvas.addEventListener('pointercancel', event => { onEventUp(event) });
+} else if (SUPPORTS_TOUCH) {
+  canvas.addEventListener('touchstart', event => { onEventDown(event) });
+  canvas.addEventListener('touchmove', event => { onEventMove(event) });
+  canvas.addEventListener('touchend', event => { onEventUp(event) });
+  canvas.addEventListener('touchcancel', event => { onEventUp(event) });
+} else {
+  canvas.addEventListener('mousedown', event => { onEventDown(event) });
+  canvas.addEventListener('mousemove', event => { onEventMove(event) });
+  canvas.addEventListener('mouseup', event => { onEventUp(event) });
+  canvas.addEventListener('mouseleave', event => { onEventUp(event) });
+}
 
 brushes.forEach(brush => {
   brush.addEventListener('click', () => {
