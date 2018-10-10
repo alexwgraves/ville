@@ -7,14 +7,13 @@ const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
+context.lineJoin = 'round';
 this.drawing = false;
 
 // create arrays to keep track of painting
 this.xClicks = [];
 this.yClicks = [];
 this.dragClicks = [];
-this.clickBrush = [];
-this.clickSize = [];
 
 // brush logic
 this.currentBrush = document.querySelector('.active').classList[1];
@@ -30,25 +29,15 @@ const brushSize = document.getElementById('brush-size');
 const currentBrushSize = document.getElementById('current-brush-size');
 this.currentSize = parseInt(brushSize.value);
 
+// data for storing canvas colors
+this.data = {};
+
 /* FUNCTIONS */
 
 const render = () => {
-  context.clearRect(0, 0, canvas.width, canvas.height);
-  context.lineJoin = 'round';
-
-  let brush, brushSize;
   for (let i = 0; i < this.xClicks.length; i++) {
-    // update brush color if it's different from previous
-    if (this.clickBrush[i] !== brush) {
-      brush = this.clickBrush[i];
-      context.strokeStyle = brushColors[brush];
-    }
-
-    // update brush size if it's different from previous
-    if (this.clickSize[i] !== brushSize) {
-      brushSize = this.clickSize[i];
-      context.lineWidth = brushSize;
-    }
+    context.strokeStyle = brushColors[this.currentBrush];
+    context.lineWidth = this.currentSize;
 
     context.beginPath();
     if (this.dragClicks[i] && i > 0) {
@@ -67,8 +56,11 @@ const addClick = (x, y, dragging) => {
   this.xClicks.push(x);
   this.yClicks.push(y);
   this.dragClicks.push(dragging);
-  this.clickBrush.push(this.currentBrush);
-  this.clickSize.push(this.currentSize);
+
+  // add to data for generation
+  const coordinate = `${x}-${y}`;
+  if (!this.data[coordinate]) this.data[coordinate] = [];
+  this.data[coordinate].push(this.currentBrush);
 }
 
 const clearActiveBrushes = () => {
@@ -94,6 +86,15 @@ const onEventMove = event => {
 
 const onEventUp = event => {
   this.drawing = false;
+  // clear clicks on up so we don't redraw anything
+  this.xClicks = [];
+  this.yClicks = [];
+  this.dragClicks = [];
+}
+
+const gatherCanvasData = () => {
+  // gather data to pass to city generator
+  console.log(this.data);
 }
 
 /* EVENT LISTENERS */
@@ -135,6 +136,6 @@ brushSize.addEventListener('input', event => {
   currentBrushSize.innerText = brushSize.value;
 });
 
-/* MAIN */
-
-render();
+document.getElementById('generate').addEventListener('click', event => {
+  gatherCanvasData();
+});

@@ -33,6 +33,25 @@ canvas {
   margin-left: 30px;
 }
 
+.inputs {
+  margin-bottom: 20px;
+}
+
+.button {
+  margin: 0;
+  padding: 10px;
+  background-color: #FFF;
+  border: 1px solid #000;
+  border-radius: 4px;
+  font-size: 1em;
+  cursor: pointer;
+}
+
+.button:hover, .button:active {
+  border: 1px solid #666;
+  color: #666;
+}
+
 .skyscrapers {
   background-color: rgba(150, 150, 150, 0.5);
 }
