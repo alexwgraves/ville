@@ -30,7 +30,16 @@ const currentBrushSize = document.getElementById('current-brush-size');
 this.currentSize = parseInt(brushSize.value);
 
 // data for storing canvas colors
-this.data = {};
+this.data = { skyscrapers: [], residential: [], commercial: [], water: [], parks: [] };
+
+/* CLASSES */
+class Circle {
+  constructor(x, y, r) {
+    this.x = x;
+    this.y = y;
+    this.r = r;
+  }
+}
 
 /* FUNCTIONS */
 
@@ -58,9 +67,7 @@ const addClick = (x, y, dragging) => {
   this.dragClicks.push(dragging);
 
   // add to data for generation
-  const coordinate = `${x}-${y}`;
-  if (!this.data[coordinate]) this.data[coordinate] = [];
-  this.data[coordinate].push(this.currentBrush);
+  this.data[this.currentBrush].push(new Circle(x, y, this.currentSize));
 }
 
 const clearActiveBrushes = () => {
@@ -92,8 +99,7 @@ const onEventUp = event => {
   this.dragClicks = [];
 }
 
-const gatherCanvasData = () => {
-  // gather data to pass to city generator
+const generateCity = () => {
   console.log(this.data);
 }
 
@@ -137,5 +143,5 @@ brushSize.addEventListener('input', event => {
 });
 
 document.getElementById('generate').addEventListener('click', event => {
-  gatherCanvasData();
+  generateCity();
 });
