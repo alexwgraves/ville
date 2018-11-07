@@ -58,35 +58,26 @@ class Polygon {
   }
 
   boundingBox() {
+    let minX = canvas.width, maxX = 0;
+    let minY = canvas.height, maxY = 0;
+    for (let point of this.edges) {
+      minX = point.x < minX ? point.x : minX;
+      maxX = point.x > maxX ? point.x : maxX;
+      minY = point.y < minY ? point.y : minY;
+      maxY = point.y > maxY ? point.y : maxY;
+    }
     this.boundaries = [
-      new Point(0, 0), // top left
-      new Point(0, 0), // top right
-      new Point(0, 0), // bottom right
-      new Point(0, 0)  // bottom left
+      new Point(minX, minY), // top left
+      new Point(maxX, minY), // top right
+      new Point(maxX, maxY), // bottom right
+      new Point(minX, maxY)  // bottom left
     ];
-    const edges = this.edges;
-
-    // sort edges array on x
-    edges.sort((a, b) => a.x === b.x ? 0 : a.x < b.x ? -1 : 1);
-    this.boundaries[0].x = edges[0].x;
-    this.boundaries[1].x = edges[edges.length - 1].x;
-    this.boundaries[2].x = edges[edges.length - 1].x;
-    this.boundaries[3].x = edges[0].x;
-    const width = edges[edges.length - 1].x - edges[0].x;
-
-    // sort edges array on y
-    edges.sort((a, b) => a.y === b.y ? 0 : a.y < b.y ? -1 : 1);
-    this.boundaries[0].y = edges[0].y;
-    this.boundaries[1].y = edges[0].y;
-    this.boundaries[2].y = edges[edges.length - 1].y;
-    this.boundaries[3].y = edges[edges.length - 1].y;
-    const height = edges[edges.length - 1].y - edges[0].y;
 
     // DEBUG MODE: draw bounding box
     if (debugMode) {
       context.lineWidth = 1;
       context.strokeStyle = '#FF0000';
-      context.strokeRect(this.boundaries[0].x, this.boundaries[0].y, width, height);
+      context.strokeRect(minX, minY, maxX - minX, maxY - minY);
       context.lineWidth = this.currentSize;
     }
   }
