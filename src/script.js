@@ -209,7 +209,6 @@ function onEventUp(event) {
 }
 
 function detectEdges(circle, color) {
-  // TODO: if i get a new canvas context at this time, does it snapshot the canvas?
   const edges = [];
   const rgb = brushColors[color].slice(4, -1).split(',');
 
@@ -252,18 +251,18 @@ function detectEdges(circle, color) {
     // check if any of the eight surrounding pixels are a different color
     const firstNot = neighbors.findIndex(p => {
       const pixel = context.getImageData(p.x, p.y, 1, 1).data;
-      return pixel[0] == 0 && pixel[1] == 0 && pixel[2] == 0;
-      // TODO: currently not handling checking against other colors
-      // return pixel[0] != rgb[0] && pixel[1] != rgb[1] && pixel[2] != rgb[2];
+      return Math.abs(pixel[0] - rgb[0]) > 5 ||
+             Math.abs(pixel[1] - rgb[1]) > 5 ||
+             Math.abs(pixel[2] - rgb[2]) > 5;
     });
 
     // find the first neighbor that is the same color and not the previous point
     const firstSame = neighbors.findIndex(p => {
       const pixel = context.getImageData(p.x, p.y, 1, 1).data;
       return (p.x !== prev.x || p.y !== prev.y) &&
-        pixel[0] != 0 && pixel[1] != 0 && pixel[2] != 0;
-        // TODO: currently not handling checking against other colors
-        // pixel[0] == rgb[0] && pixel[1] == rgb[1] && pixel[2] == rgb[2];
+        Math.abs(pixel[0] - rgb[0]) < 6 &&
+        Math.abs(pixel[1] - rgb[1]) < 6 &&
+        Math.abs(pixel[2] - rgb[2]) < 6;
     });
 
     if (firstNot !== -1) {
@@ -340,12 +339,12 @@ document.getElementById('edges').addEventListener('click', event => {
     this.polygons[i].scatterPoints();
 
     // DEBUG MODE: draw edge outline
-    if (debugMode) {
+    // if (debugMode) {
       for (let point of this.polygons[i].edges) {
         context.fillStyle = '#000';
         context.fillRect(point.x, point.y, 1, 1);
       }
-    }
+    // }
   }
   this.polygonIndex = this.polygons.length;
 });
