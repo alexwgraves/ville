@@ -9,10 +9,15 @@ canvas {
   display: block;
 }
 
-.brushes {
+.column {
   position: absolute;
-  top: 20px;
-  left: 20px;
+  top: 0;
+  height: calc(100vh - 40px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+  background-color: #EEE;
 }
 
 .brush {
@@ -51,6 +56,16 @@ canvas {
 .button:hover, .button:active {
   border: 1px solid #666;
   color: #666;
+}
+
+.debug-controls {
+  display: none;
+  margin-bottom: 10px;
+}
+
+.checkbox {
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .skyscrapers {

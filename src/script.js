@@ -17,6 +17,7 @@ this.dragClicks = [];
 
 // brush logic
 this.currentBrush = document.querySelector('.active').classList[1];
+this.lastBrush = this.currentBrush;
 const brushes = Array.prototype.slice.call(document.getElementsByClassName('brush'));
 const brushColors = {
   skyscrapers: 'rgb(203,203,203)',
@@ -35,6 +36,7 @@ var scale = 20; // TODO: make this chooseable?
 
 // data for storing canvas colors
 this.clickData = { skyscrapers: [], residential: [], commercial: [], water: [], parks: [] };
+this.innerPoints = { skyscrapers: [], residential: [], commercial: [], water: [], parks: [] };
 this.polygons = [];
 this.polygonIndex = 0;
 
@@ -64,7 +66,7 @@ class Polygon {
   boundingBox() {
     let minX = canvas.width, maxX = 0;
     let minY = canvas.height, maxY = 0;
-    for (let point of this.edges) {
+    for (const point of this.edges) {
       minX = point.x < minX ? point.x : minX;
       maxX = point.x > maxX ? point.x : maxX;
       minY = point.y < minY ? point.y : minY;
@@ -104,7 +106,7 @@ class Polygon {
 
     // DEBUG MODE: draw all of the stratified sampled points
     if (debugMode) {
-      for (let point of points) {
+      for (const point of points) {
         context.fillStyle = '#000';
         context.fillRect(point.x, point.y, 1, 1);
       }
@@ -139,7 +141,7 @@ class Polygon {
 
     // DEBUG MODE: draw the points within the polygon in red
     if (debugMode) {
-      for (let point of this.points) {
+      for (const point of this.points) {
         context.fillStyle = '#FF0000';
         context.fillRect(point.x, point.y, 1, 1);
       }
@@ -183,6 +185,9 @@ function clearActiveBrushes() {
 }
 
 function onEventDown(event) {
+  const i = this.clickData[this.lastBrush].length - 1;
+  if (i > -1) this.polygons.push(detectEdges(this.clickData[this.lastBrush][i], this.lastBrush));
+
   const mouseX = event.pageX - canvas.offsetLeft;
   const mouseY = event.pageY - canvas.offsetTop;
   this.drawing = true;
@@ -203,9 +208,6 @@ function onEventUp(event) {
   this.xClicks = [];
   this.yClicks = [];
   this.dragClicks = [];
-  // TODO: maybe put this here, maybe do it at the generation step
-  // const i = this.clickData[this.currentBrush].length - 1;
-  // this.polygons.push(detectEdges(this.clickData[this.currentBrush][i], this.currentBrush));
 }
 
 function detectEdges(circle, color) {
@@ -279,8 +281,14 @@ function detectEdges(circle, color) {
 }
 
 function generateCity() {
+  // detect edges for the last click
   const i = this.clickData[this.currentBrush].length - 1;
-  this.polygons.push(detectEdges(this.clickData[this.currentBrush][i], this.currentBrush));
+  if (i > -1) this.polygons.push(detectEdges(this.clickData[this.currentBrush][i], this.currentBrush));
+
+  for (const polygon of this.polygons) {
+    polygon.boundingBox();
+    polygon.scatterPoints();
+  }
 }
 
 /* EVENT LISTENERS */
@@ -312,6 +320,7 @@ if (SUPPORTS_POINTER) {
 brushes.forEach(brush => {
   brush.addEventListener('click', () => {
     clearActiveBrushes();
+    this.lastBrush = this.currentBrush;
     this.currentBrush = brush.classList[1];
     brush.classList.add('active');
   });
@@ -324,27 +333,21 @@ brushSize.addEventListener('input', event => {
 
 document.getElementById('debug').addEventListener('change', event => {
   debugMode = event.target.checked;
+  document.getElementById('debug-controls').style.display = debugMode ? 'block' : 'none';
 });
 
 document.getElementById('generate').addEventListener('click', event => {
-  // TODO: currently, this just runs edge detection on the last-drawn point
   generateCity();
 });
 
 document.getElementById('edges').addEventListener('click', event => {
-  // debug feature; see edges created from detection algorithm
-  for (let i = this.polygonIndex; i < this.polygons.length; i++) {
-    // TODO: move this out of here
-    this.polygons[i].boundingBox();
-    this.polygons[i].scatterPoints();
-
-    // DEBUG MODE: draw edge outline
-    // if (debugMode) {
-      for (let point of this.polygons[i].edges) {
+  // DEBUG MODE: draw edge outlines
+  if (debugMode) {
+    for (const polygon of this.polygons) {
+      for (const point of polygon.edges) {
         context.fillStyle = '#000';
         context.fillRect(point.x, point.y, 1, 1);
       }
-    // }
+    }
   }
-  this.polygonIndex = this.polygons.length;
 });
