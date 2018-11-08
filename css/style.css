@@ -53,7 +53,12 @@ canvas {
   cursor: pointer;
 }
 
-.button:hover, .button:active {
+.button.disabled {
+  border: 1px solid #999;
+  color: #999;
+}
+
+.button:hover:not(.disabled), .button:active:not(.disabled) {
   border: 1px solid #666;
   color: #666;
 }

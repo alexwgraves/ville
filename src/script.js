@@ -90,7 +90,9 @@ class Polygon {
 
   /* Uses stratified sampling to scatter points within the Polygon for roads. */
   scatterPoints() {
-    this.points = [];
+    // we don't want to generate roads in parks or water
+    if (this.color === 'parks' || this.color === 'water') return;
+
     const points = [];
     // scatter points using stratified sampling within bounding box
     const minX = this.boundaries[0].x, minY = this.boundaries[0].y;
@@ -124,6 +126,7 @@ class Polygon {
 
     // starting at the point, go right and count the edges we hit
     // TODO: handle when points cross tangent to the polygon
+    this.points = [];
     points.forEach(point => {
       // keep track of the last time we crossed the polygon's edge
       let lastCrossing = 0;
@@ -338,6 +341,8 @@ document.getElementById('debug').addEventListener('change', event => {
 
 document.getElementById('generate').addEventListener('click', event => {
   generateCity();
+  event.target.disabled = true;
+  event.target.classList.add('disabled');
 });
 
 document.getElementById('edges').addEventListener('click', event => {
