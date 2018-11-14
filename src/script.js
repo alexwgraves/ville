@@ -49,10 +49,10 @@ class Point {
 }
 
 class Circle {
-  constructor(x, y, r) {
+  constructor(x, y, d) {
     this.x = x;
     this.y = y;
-    this.r = r / 2;
+    this.r = d / 2;
   }
 }
 
@@ -148,6 +148,27 @@ class Polygon {
         context.fillStyle = '#FF0000';
         context.fillRect(point.x, point.y, 1, 1);
       }
+    }
+  }
+
+  createHighway() {
+    // sort points on x or y randomly but equally
+    const random = Math.random();
+    this.points.sort((a, b) => {
+      if (random < 0.5) return a.x === b.x ? 0 : a.x < b.x ? -1 : 1;
+      return a.y === b.y ? 0 : a.y < b.y ? -1 : 1;
+    });
+
+    // DEBUG MODE: draw the main highway
+    if (debugMode) {
+      context.lineWidth = 1;
+      context.strokeStyle = '#000';
+      context.beginPath();
+      context.moveTo(this.points[0].x, this.points[0].y);
+      context.lineTo(this.points[this.points.length - 1].x, this.points[this.points.length - 1].y);
+      context.closePath();
+      context.stroke();
+      context.lineWidth = this.currentSize;
     }
   }
 }
