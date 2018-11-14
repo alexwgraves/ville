@@ -1,18 +1,18 @@
 {
   "name": "ville",
   "version": "1.0.0",
-  "description": "Procedural city generator based on user-painted canvas.",
+  "description": "A user input-based procedural city generator",
+  "main": "index.js",
   "scripts": {
-    "build": "uglifycss css/style.css --output style.min.css && minify src/*.js --out-file script.min.js --mangle.keepClassName"
+    "build": "rm -rf dist/ && parcel build index.html"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/alexwgraves/ville.git"
-  },
+  "keywords": [],
   "author": "Alex Graves",
   "license": "ISC",
   "devDependencies": {
-    "babel-minify": "^0.5.0",
-    "uglifycss": "0.0.29"
+    "parcel-bundler": "^1.10.3"
+  },
+  "dependencies": {
+    "src": "^1.1.2"
   }
 }
