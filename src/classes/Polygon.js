@@ -1,4 +1,6 @@
-class Polygon {
+import Point from './Point.js';
+
+export default class Polygon {
   constructor(edges, color) {
     this.edges = edges;
     this.color = color;
