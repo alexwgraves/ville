@@ -27,8 +27,7 @@ export default class Point {
   }
 
   scalarMultiply(s) {
-    this.x *= s;
-    this.y *= s;
+    return new Point(this.x * s, this.y * s);
   }
 
   add(other) {
