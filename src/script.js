@@ -5,7 +5,7 @@ const SUPPORTS_TOUCH = 'ontouchstart' in window;
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
-canvas.width = window.innerWidth;
+canvas.width = window.innerWidth * 0.85;
 canvas.height = window.innerHeight;
 context.lineJoin = 'round';
 this.drawing = false;
@@ -319,7 +319,7 @@ function generateCity() {
 
 // update the canvas size on window resize
 window.addEventListener('resize', () => {
-  canvas.width = window.innerWidth;
+  canvas.width = window.innerWidth * 0.85;
   canvas.height = window.innerHeight;
   render();
 });

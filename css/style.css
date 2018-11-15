@@ -4,14 +4,17 @@ body {
 }
 
 canvas {
-  width: 100vw;
+  width: 85vw;
   height: 100vh;
   display: block;
 }
 
+.row {
+  display: flex;
+}
+
 .column {
-  position: absolute;
-  top: 0;
+  width: 15vw;
   height: calc(100vh - 40px);
   display: flex;
   flex-direction: column;
