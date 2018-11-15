@@ -2,9 +2,9 @@ import * as noise from './../perlin.js';
 
 export default class Heatmap {
   static populationAt(x, y) {
-    const one = (noise.simplex2(x / 10000, y / 10000) + 1) / 2;
-    const two = (noise.simplex2(x / 20000 + 500, y / 20000 + 500) + 1) / 2;
-    const three = (noise.simplex2(x / 20000 + 1000, y / 20000 + 1000) + 1) / 2;
+    const one = (noise.simplex2(x / 500, y / 500) + 1) / 2;
+    const two = (noise.simplex2(x / 1000 + 50, y / 1000 + 50) + 1) / 2;
+    const three = (noise.simplex2(x / 1000 + 100, y / 1000 + 100) + 1) / 2;
     return Math.pow((one * two + three) / 2, 2);
   }
 
