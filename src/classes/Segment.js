@@ -95,11 +95,8 @@ export default class Segment {
   }
 
   linksForEndContaining(segment) {
-    if (this.links.backwards.includes(segment)) {
-      return this.links.backwards;
-    } else if (this.links.forwards.includes(segment)) {
-      return this.links.forwards;
-    }
+    if (this.links.backwards.includes(segment)) return this.links.backwards;
+    else if (this.links.forwards.includes(segment)) return this.links.forwards;
   }
 
   split(point, segment, segments, tree) {

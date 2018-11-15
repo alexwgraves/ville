@@ -32,25 +32,22 @@ function localConstraints(segment, segments, tree, debugData) {
       if (intersection) {
         if (!action.params.time || intersection.time < actions.params.time) {
           action.params.time = intersection.time;
-
           action.priority = 4;
-          return action.function = () => {
-            // if intersecting lines are too similar don't continue
-            if (util.minDegreeDifference(other.direction(), segment.direction()) < MINIMUM_INTERSECTION_DEVIATION) {
-              return false;
-            }
-
-            other.split(intersection, segment, segments, tree);
-            segment.road.end = intersection;
-            segmentEnd.params.severed = true;
-
-            if (debugData) {
-              debugData.intersections = debugData.intersections || [];
-              debugData.intersections.push(new Point(intersection.x, intersection.y));
-            }
-
-            return true;
+          // if intersecting lines are too similar don't continue
+          if (util.minDegreeDifference(other.direction(), segment.direction()) < MINIMUM_INTERSECTION_DEVIATION) {
+            return false;
           }
+
+          other.split(intersection, segment, segments, tree);
+          segment.road.end = intersection;
+          segment.params.severed = true;
+
+          if (debugData) {
+            debugData.intersections = debugData.intersections || [];
+            debugData.intersections.push(new Point(intersection.x, intersection.y));
+          }
+
+          return true;
         }
       }
     }
@@ -62,38 +59,36 @@ function localConstraints(segment, segments, tree, debugData) {
       if (segment.road.end.distance(other.road.end) <= ROAD_SNAP_DISTANCE) {
         const point = other.road.end;
         action.priority = 3;
-        return action.function = () => {
-          segment.road.end = point;
-          segment.params.severed = true;
+        segment.road.end = point;
+        segment.params.severed = true;
 
-          // update other's links corresponding to other.road.end
-          const links = other.startIsBackwards() ? other.links.forwards : other.links.backwards;
+        // update other's links corresponding to other.road.end
+        const links = other.startIsBackwards() ? other.links.forwards : other.links.backwards;
 
-          // check for duplicate lines, don't add if it exists
-          const duplicates = links.some(link => {
-            return (link.road.start.equals(segment.road.end) && link.road.end.equals(segment.road.start)) ||
-              (link.road.start.equals(segment.road.start) && link.road.end.equals(segment.road.end));
-          });
-          if (duplicates) return false;
+        // check for duplicate lines, don't add if it exists
+        const duplicates = links.some(link => {
+          return (link.road.start.equals(segment.road.end) && link.road.end.equals(segment.road.start)) ||
+            (link.road.start.equals(segment.road.start) && link.road.end.equals(segment.road.end));
+        });
+        if (duplicates) return false;
 
-          links.forEach(link => {
-            // pick links of remaining segments at junction corresponding to other.road.end
-            link.linksForEndContaining(other).push(segment);
+        links.forEach(link => {
+          // pick links of remaining segments at junction corresponding to other.road.end
+          link.linksForEndContaining(other).push(segment);
 
-            // add junction segments to snapped segment
-            segment.links.forwards.push(link);
-          });
+          // add junction segments to snapped segment
+          segment.links.forwards.push(link);
+        });
 
-          links.push(segment);
-          segment.links.forwards.push(other);
+        links.push(segment);
+        segment.links.forwards.push(other);
 
-          if (debugData) {
-            debugData.snaps = debugData.snaps || [];
-            debugData.snaps.push(new Point(point.x, point.y));
-          }
-
-          return true;
+        if (debugData) {
+          debugData.snaps = debugData.snaps || [];
+          debugData.snaps.push(new Point(point.x, point.y));
         }
+
+        return true;
       }
     }
 
@@ -104,29 +99,26 @@ function localConstraints(segment, segments, tree, debugData) {
       if (distance2 < ROAD_SNAP_DISTANCE * ROAD_SNAP_DISTANCE && lineProj2 >= 0 && lineProj2 <= length2) {
         const point = pointOnLine;
         action.priority = 2;
-        return action.function = () => {
-          segment.road.end = point;
-          segment.params.severed = true;
+        segment.road.end = point;
+        segment.params.severed = true;
 
-          // if intersecting lines are too similar don't continue
-          if (util.minDegreeDifference(other.direction(), segment.direction() < MINIMUM_INTERSECTION_DEVIATION)) {
-            return false;
-          }
-
-          other.split(point, segment, segments, tree);
-
-          if (debugData) {
-            debugData.intersectionsRadius = debugData.intersectionsRadius || [];
-            debugData.intersectionsRadius.push(new Point(point.x, point.y));
-          }
-
-          return true;
+        // if intersecting lines are too similar don't continue
+        if (util.minDegreeDifference(other.direction(), segment.direction()) < MINIMUM_INTERSECTION_DEVIATION) {
+          return false;
         }
+
+        other.split(point, segment, segments, tree);
+
+        if (debugData) {
+          debugData.intersectionsRadius = debugData.intersectionsRadius || [];
+          debugData.intersectionsRadius.push(new Point(point.x, point.y));
+        }
+
+        return true;
       }
     }
   }
 
-  if (action.function) return action.function();
   return true;
 }
 

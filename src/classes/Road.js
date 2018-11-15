@@ -1,3 +1,5 @@
+import Point from './Point.js';
+
 export default class Road {
   constructor(start, end, segment) {
     this.start = start;
@@ -30,6 +32,7 @@ export default class Road {
     const u = numerator / denominator;
     const t = starts.cross(s) / denominator;
     const epsilon = 0.001;
-    return t > epsilon && t < 1 - epsilon && u > epsilon && u < 1 - epsilon;
+    const intersect = t > epsilon && t < 1 - epsilon && u > epsilon && u < 1 - epsilon;
+    return intersect ? new Point(this.start.x + t * r.x, this.start.y + t * r.y) : intersect;
   }
 }

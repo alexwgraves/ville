@@ -55,7 +55,7 @@ export default class Point {
   }
 
   project(other) {
-    return other.scalarMultiply(this.dot(other) / other.length());
+    return other.scalarMultiply(this.dot(other) / other.length2());
   }
 
   distanceToLine(start, end) {
