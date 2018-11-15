@@ -11,7 +11,7 @@ export function randomAngle(limit) {
   const nonUniformNorm = Math.pow(Math.abs(limit), 3);
   let value = 0;
   while (value === 0 || Math.random() < Math.pow(Math.abs(value), 3) / nonUniformNorm) {
-    value = randomRange(-limit, +limit);
+    value = randomRange(-limit, limit);
   }
   return value;
 }

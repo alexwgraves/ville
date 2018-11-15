@@ -22,12 +22,6 @@ export default class Segment {
     this.collider = new Collision(this, Collision.Type.LINE, {start: start, end: end, width: this.width});
 
     this.roadRevision = 0;
-    this.directionRevision = undefined;
-    this.lengthRevision = undefined;
-
-    this.cachedDirection = undefined;
-    this.cachedLength = undefined;
-
     this.road = new Road(start, end, this);
 
     // time-step delay before this road is evaluated
@@ -83,7 +77,7 @@ export default class Segment {
 
   costTo(other, fromFraction) {
     const segmentEnd = this.endContaining(other);
-    const fraction = fromFraction ? (segmentEnd === Segment.End.START ? fromFraction : fromFraction) : 0.5;
+    const fraction = fromFraction ? (segmentEnd === Segment.End.START ? fromFraction : 1 - fromFraction) : 0.5;
     return this.cost() * fraction;
   }
 
@@ -97,8 +91,6 @@ export default class Segment {
       return backwards ? Segment.End.START : Segment.End.END;
     } else if (this.links.forwards.includes(segment)) {
       return backwards ? Segment.End.END : Segment.End.START;
-    } else {
-      return undefined;
     }
   }
 
@@ -107,8 +99,6 @@ export default class Segment {
       return this.links.backwards;
     } else if (this.links.forwards.includes(segment)) {
       return this.links.forwards;
-    } else {
-      return undefined;
     }
   }
 

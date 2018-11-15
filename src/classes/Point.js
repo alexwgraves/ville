@@ -1,3 +1,5 @@
+const EPSILON = 0.00000001;
+
 export default class Point {
   constructor(x, y) {
     this.x = x;
@@ -23,7 +25,8 @@ export default class Point {
   }
 
   equals(other) {
-    return this.x === other.x && this.y === other.y;
+    const diff = this.minus(other);
+    return diff.length2() < EPSILON;
   }
 
   scalarMultiply(s) {

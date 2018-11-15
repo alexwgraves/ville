@@ -11,31 +11,13 @@ import { ROAD_SNAP_DISTANCE,
          QUADTREE_PARAMS, QUADTREE_MAX_OBJECTS, QUADTREE_MAX_LEVELS,
          SEGMENT_COUNT_LIMIT } from './config.js';
 import * as util from './util.js';
-import * as noise from './../third_party/perlin.js';
+import * as noise from './perlin.js';
 
 import Point from './classes/Point.js';
 import Heatmap from './classes/Heatmap.js';
 import Segment from './classes/Segment.js';
 import QuadTree from './classes/QuadTree.js';
 import SegmentFactory from './classes/SegmentFactory.js';
-
-function doRoadSegmentsIntersect(a, b) {
-  let intersectX = false;
-  for (let i = a.start.x; i < a.end.x; i++) {
-    if (i > b.start.x && i < b.end.x) {
-      intersectX = true;
-      break;
-    }
-  }
-  let intersectY = false;
-  for (let i = a.start.y; i < a.end.y; i++) {
-    if (i > b.start.y && i < b.end.y) {
-      intersectY = true;
-      break;
-    }
-  }
-  return intersectX && intersectY;
-}
 
 function localConstraints(segment, segments, tree, debugData) {
   const action = { priority: 0, params: {} };
@@ -46,7 +28,7 @@ function localConstraints(segment, segments, tree, debugData) {
 
     // intersection check
     if (action.priority < 5) {
-      const intersection = doRoadSegmentsIntersect(segment.road, other.road);
+      const intersection = segment.road.intersects(other.road);
       if (intersection) {
         if (!action.params.time || intersection.time < actions.params.time) {
           action.params.time = intersection.time;
@@ -155,7 +137,6 @@ function globalGoals(previousSegment) {
 
     // used for highways or going straight on a normal branch
     const templateContinue = (direction) => template(direction, previousSegment.length(), 0, previousSegment.params);
-
     // not using params, i.e. not highways
     const templateBranch = (direction) => template(direction, DEFAULT_SEGMENT_LENGTH, previousSegment.params.highway ? NORMAL_BRANCH_TIME_DELAY_FROM_HIGHWAY : 0);
 
@@ -217,7 +198,7 @@ export function generate(seed) {
   const rootSegment = new Segment(seed, new Point(seed.x + HIGHWAY_SEGMENT_LENGTH, seed.y), 0, { highway: true });
   const oppositeDirection = SegmentFactory.fromExisting(rootSegment);
   const newEnd = new Point(rootSegment.road.start.x - HIGHWAY_SEGMENT_LENGTH, oppositeDirection.road.end.y);
-  oppositeDirection.road.end = newEnd;
+  oppositeDirection.road.setEnd(newEnd);
   oppositeDirection.links.backwards.push(rootSegment);
   rootSegment.links.backwards.push(oppositeDirection);
   queue.push(rootSegment);
@@ -225,16 +206,16 @@ export function generate(seed) {
 
   const segments = [];
   // TODO: bounds should be the bounding box of the polygon
-  // maxObjects should vary based on the type of city area
+  // TODO: maxObjects should vary based on the type of city area
   const treeParams = { x: seed.x, y: seed.y, width: HIGHWAY_SEGMENT_LENGTH, height: HIGHWAY_SEGMENT_LENGTH };
   const tree = new QuadTree(treeParams, QUADTREE_MAX_OBJECTS, QUADTREE_MAX_LEVELS);
 
   while (queue.length && segments.length < SEGMENT_COUNT_LIMIT) {
-    // pop smallest r(ti, ri, qi) from Q (i.e. smallest time)
-    let minT = undefined;
+    // pop smallest road from the priority queue (i.e. smallest time)
+    let minT = queue[0].time;
     let minT_i = 0;
     queue.forEach((segment, i) => {
-      if (!minT || segment.time < minT) {
+      if (segment.time < minT) {
         minT = segment.time;
         minT_i = i;
       }
