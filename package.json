@@ -4,7 +4,7 @@
   "description": "A user input-based procedural city generator",
   "main": "index.js",
   "scripts": {
-    "build": "rm -rf dist/ && parcel build index.html",
+    "build": "rm -rf dist/ && parcel build index.html --public-url='/ville'",
     "dev": "rm -rf dist/ && parcel watch index.html"
   },
   "keywords": [],
