@@ -6,6 +6,8 @@ export const SEGMENT_COUNT_LIMIT = 500;
 
 export const BRANCH_ANGLE = 3; // in degrees
 export const FORWARD_ANGLE = 10; // in degrees
+export const SKYSCRAPER_BRANCH_ANGLE = 1; // in degrees
+export const SKYSCRAPER_FORWARD_ANGLE = 1; // in degrees
 
 export const HIGHWAY_BRANCH_PROBABILITY = 0.05;
 export const DEFAULT_BRANCH_PROBABILITY = 0.4;

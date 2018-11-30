@@ -1,6 +1,8 @@
 import Point from './classes/Point.js';
 import Circle from './classes/Circle.js';
 import Polygon from './classes/Polygon.js';
+import * as generator from './generation.js';
+import * as draw from './draw.js';
 
 const SUPPORTS_POINTER = 'PointerEvent' in window;
 const SUPPORTS_TOUCH = 'ontouchstart' in window;
@@ -244,5 +246,22 @@ export function init(canvas, context) {
     interpretInput();
     event.target.disabled = true;
     event.target.classList.add('disabled');
+  });
+
+  document.getElementById('generate').addEventListener('click', event => {
+    // detect edges for the last click
+    const i = options.clickData[options.currentBrush].length - 1;
+    if (i > -1) options.polygons.push(detectEdges(options.clickData[options.currentBrush][i], options.currentBrush));
+
+    // create road networks seeded from each polygon
+    options.polygons.forEach(polygon => {
+      console.log(polygon);
+      if (polygon.color !== 'parks' && polygon.color !== 'water') {
+        // only generate roads for skyscrapers, commercial, and residential
+        console.log(polygon.getCenter(options));
+        const segments = generator.generate(polygon.getCenter(options), polygon.color);
+        segments.forEach(segment => draw.drawSegment(options.context, segment));
+      }
+    });
   });
 }

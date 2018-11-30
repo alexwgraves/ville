@@ -4,6 +4,7 @@ import { ROAD_SNAP_DISTANCE,
          HIGHWAY_SEGMENT_LENGTH,
          NORMAL_BRANCH_TIME_DELAY_FROM_HIGHWAY,
          BRANCH_ANGLE, FORWARD_ANGLE,
+         SKYSCRAPER_BRANCH_ANGLE, SKYSCRAPER_FORWARD_ANGLE,
          HIGHWAY_BRANCH_POPULATION_THRESHOLD,
          NORMAL_BRANCH_POPULATION_THRESHOLD,
          HIGHWAY_BRANCH_PROBABILITY,
@@ -19,7 +20,7 @@ import Segment from './classes/Segment.js';
 import QuadTree from './classes/QuadTree.js';
 import SegmentFactory from './classes/SegmentFactory.js';
 
-function localConstraints(segment, segments, tree, debugData) {
+function localConstraints(segment, segments, tree) {
   const action = { priority: 0, params: {} };
 
   const matches = tree.retrieve(segment.collider.limits());
@@ -41,11 +42,6 @@ function localConstraints(segment, segments, tree, debugData) {
           other.split(intersection, segment, segments, tree);
           segment.road.end = intersection;
           segment.params.severed = true;
-
-          if (debugData) {
-            debugData.intersections = debugData.intersections || [];
-            debugData.intersections.push(new Point(intersection.x, intersection.y));
-          }
 
           return true;
         }
@@ -83,11 +79,6 @@ function localConstraints(segment, segments, tree, debugData) {
         links.push(segment);
         segment.links.forwards.push(other);
 
-        if (debugData) {
-          debugData.snaps = debugData.snaps || [];
-          debugData.snaps.push(new Point(point.x, point.y));
-        }
-
         return true;
       }
     }
@@ -109,11 +100,6 @@ function localConstraints(segment, segments, tree, debugData) {
 
         other.split(point, segment, segments, tree);
 
-        if (debugData) {
-          debugData.intersectionsRadius = debugData.intersectionsRadius || [];
-          debugData.intersectionsRadius.push(new Point(point.x, point.y));
-        }
-
         return true;
       }
     }
@@ -122,7 +108,7 @@ function localConstraints(segment, segments, tree, debugData) {
   return true;
 }
 
-function globalGoals(previousSegment) {
+function globalGoals(previousSegment, color) {
   const newBranches = [];
   if (!previousSegment.params.severed) {
     const template = (direction, length, time, params) => SegmentFactory.usingDirection(previousSegment.road.end, direction, length, time, params);
@@ -135,18 +121,21 @@ function globalGoals(previousSegment) {
     const continueStraight = templateContinue(previousSegment.direction());
     const straightPop = Heatmap.popOnRoad(continueStraight.road);
 
+    const F_ANGLE = color === 'skyscrapers' ? SKYSCRAPER_FORWARD_ANGLE : FORWARD_ANGLE;
+    const B_ANGLE = color === 'skyscrapers' ? SKYSCRAPER_BRANCH_ANGLE : BRANCH_ANGLE;
+
     if (previousSegment.params.highway) {
-      const randomStraight = templateContinue(previousSegment.direction() + util.randomAngle(FORWARD_ANGLE));
+      const randomStraight = templateContinue(previousSegment.direction() + util.randomAngle(F_ANGLE));
       const randomPop = Heatmap.popOnRoad(randomStraight.road);
       const roadPop = randomPop > straightPop ? randomPop : straightPop;
       newBranches.push(randomPop > straightPop ? randomStraight : continueStraight);
 
       if (roadPop > HIGHWAY_BRANCH_POPULATION_THRESHOLD) {
         if (Math.random() < HIGHWAY_BRANCH_PROBABILITY) {
-          const leftHighwayBranch = templateContinue(previousSegment.direction() - 90 + util.randomAngle(BRANCH_ANGLE));
+          const leftHighwayBranch = templateContinue(previousSegment.direction() - 90 + util.randomAngle(B_ANGLE));
           newBranches.push(leftHighwayBranch);
         } else if (Math.random() < HIGHWAY_BRANCH_PROBABILITY) {
-          const rightHighwayBranch = templateContinue(previousSegment.direction() + 90 + util.randomAngle(BRANCH_ANGLE));
+          const rightHighwayBranch = templateContinue(previousSegment.direction() + 90 + util.randomAngle(B_ANGLE));
           newBranches.push(rightHighwayBranch);
         }
       }
@@ -156,10 +145,10 @@ function globalGoals(previousSegment) {
 
     if (straightPop > NORMAL_BRANCH_POPULATION_THRESHOLD) {
       if (Math.random() < DEFAULT_BRANCH_PROBABILITY) {
-        const leftBranch = templateBranch(previousSegment.direction() - 90 + util.randomAngle(BRANCH_ANGLE));
+        const leftBranch = templateBranch(previousSegment.direction() - 90 + util.randomAngle(B_ANGLE));
         newBranches.push(leftBranch);
       } else if (Math.random() < DEFAULT_BRANCH_PROBABILITY) {
-        const rightBranch = templateBranch(previousSegment.direction() + 90 + util.randomAngle(BRANCH_ANGLE));
+        const rightBranch = templateBranch(previousSegment.direction() + 90 + util.randomAngle(B_ANGLE));
         newBranches.push(rightBranch);
       }
     }
@@ -181,9 +170,7 @@ function globalGoals(previousSegment) {
   return newBranches;
 }
 
-export function generate(seed) {
-  const debugData = {};
-  // TODO: change this to use seed data from user input
+export function generate(seed, color) {
   noise.seed(Math.random());
 
   const queue = [];
@@ -198,8 +185,8 @@ export function generate(seed) {
 
   const segments = [];
   // TODO: bounds should be the bounding box of the polygon
-  // TODO: maxObjects should vary based on the type of city area
   const treeParams = { x: seed.x, y: seed.y, width: HIGHWAY_SEGMENT_LENGTH, height: HIGHWAY_SEGMENT_LENGTH };
+  // TODO: maxObjects should vary based on the type of city area
   const tree = new QuadTree(treeParams, QUADTREE_MAX_OBJECTS, QUADTREE_MAX_LEVELS);
 
   while (queue.length && segments.length < SEGMENT_COUNT_LIMIT) {
@@ -214,13 +201,13 @@ export function generate(seed) {
     });
 
     const minSegment = queue.splice(minT_i, 1)[0];
-    const accepted = localConstraints(minSegment, segments, tree, debugData);
+    const accepted = localConstraints(minSegment, segments, tree);
     if (accepted) {
       if (minSegment.setUpBranchLinks) {
         minSegment.setUpBranchLinks();
       }
       minSegment.addSegment(segments, tree);
-      globalGoals(minSegment).forEach(segment => {
+      globalGoals(minSegment, color).forEach(segment => {
         segment.time += minSegment.time + 1;
         queue.push(segment);
       });
