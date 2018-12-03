@@ -8,3 +8,16 @@ export function drawSegment(context, segment) {
   context.closePath();
   context.stroke();
 }
+
+export function drawBuilding(context, building) {
+  context.fillStyle = 'rgba(0,0,0,0.2)';
+  // context.fillStyle = '#000000';
+
+  context.beginPath();
+  context.moveTo(building.corners[0].x, building.corners[0].y);
+  context.lineTo(building.corners[1].x, building.corners[1].y);
+  context.lineTo(building.corners[2].x, building.corners[2].y);
+  context.lineTo(building.corners[3].x, building.corners[3].y);
+  context.closePath();
+  context.fill();
+}

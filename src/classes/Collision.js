@@ -1,3 +1,5 @@
+import * as util from './../util.js';
+
 import Point from './Point.js';
 
 export default class Collision {
@@ -41,8 +43,8 @@ export default class Collision {
     if (this.collisionRevision !== this.limitsRevision) {
       this.limitsRevision = this.collisionRevision;
       if (this.type === Collision.Type.RECT) {
-        minX = this.minCorner('x').x;
-        minY = this.minCorner('y').y;
+        const minX = this.minCorner('x').x;
+        const minY = this.minCorner('y').y;
         this.cachedLimits = {
           x: minX,
           y: minY,

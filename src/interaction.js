@@ -255,12 +255,13 @@ export function init(canvas, context) {
 
     // create road networks seeded from each polygon
     options.polygons.forEach(polygon => {
-      console.log(polygon);
       if (polygon.color !== 'parks' && polygon.color !== 'water') {
         // only generate roads for skyscrapers, commercial, and residential
-        console.log(polygon.getCenter(options));
-        const segments = generator.generate(polygon.getCenter(options), polygon.color);
+        const { segments, buildings } = generator.generate(polygon.getCenter(options), polygon.color);
+
+        // draw generation roads and building on map
         segments.forEach(segment => draw.drawSegment(options.context, segment));
+        buildings.forEach(building => draw.drawBuilding(options.context, building));
       }
     });
   });

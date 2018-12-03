@@ -19,6 +19,7 @@ import Heatmap from './classes/Heatmap.js';
 import Segment from './classes/Segment.js';
 import QuadTree from './classes/QuadTree.js';
 import SegmentFactory from './classes/SegmentFactory.js';
+import BuildingFactory from './classes/BuildingFactory.js';
 
 function localConstraints(segment, segments, tree) {
   const action = { priority: 0, params: {} };
@@ -219,5 +220,13 @@ export function generate(seed, color) {
     segment.id = id++;
   }
 
-  return segments;
+  // building generation
+  let buildings = [];
+  segments.forEach(segment => {
+    const newBuildings = BuildingFactory.aroundSegment(BuildingFactory.fromProbability, segment, 5, 40, tree);
+    newBuildings.forEach(building => tree.insert(building.collider.limits()));
+    buildings = buildings.concat(newBuildings);
+  });
+
+  return { segments, buildings };
 }
