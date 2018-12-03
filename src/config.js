@@ -2,7 +2,7 @@ export const DEFAULT_SEGMENT_WIDTH = 1;
 export const HIGHWAY_SEGMENT_WIDTH = 2;
 export const DEFAULT_SEGMENT_LENGTH = 25;
 export const HIGHWAY_SEGMENT_LENGTH = 30;
-export const SEGMENT_COUNT_LIMIT = 50;
+export const SEGMENT_COUNT_LIMIT = 500;
 
 export const BRANCH_ANGLE = 3; // in degrees
 export const FORWARD_ANGLE = 10; // in degrees

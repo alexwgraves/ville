@@ -12,8 +12,6 @@ export default class Collision {
     this.type = type;
     this.properties = properties;
     this.collisionRevision = 0;
-    this.limitsRevision = undefined;
-    this.cachedLimits = undefined;
   }
 
   updateCollisionProperties(properties) {
@@ -85,17 +83,17 @@ export default class Collision {
 
     if (this.type === Collision.Type.CIRCLE) {
       if (other.type === Collision.Type.RECT) {
-        other.rectCircleCollision(this);
+        return other.rectCircleCollision(this);
       }
     } else if (this.type === Collision.Type.RECT) {
       if (other.type !== Collision.Type.CIRCLE) {
-        this.rectRectIntersection(other);
+        return this.rectRectIntersection(other);
       } else {
-        this.rectCircleCollision(other);
+        return this.rectCircleCollision(other);
       }
     } else if (this.type === Collision.Type.LINE) {
       if (other.type !== Collision.Type.CIRCLE) {
-        this.rectRectIntersection(other);
+        return this.rectRectIntersection(other);
       }
     }
   }
@@ -109,36 +107,33 @@ export default class Collision {
     // get the correct properties
     const properties = this.type === Collision.Type.LINE ? this.rectPropsFromLine() : this.properties;
     const corners = properties.corners;
+    const center = circle.properties.center;
     const radius = circle.properties.radius;
 
     // check for corner intersections with circle
     for (const corner of corners) {
-      if (corner.distance2(circle.properties.center) <= radius * radius) {
-        return true;
-      }
-
-      // check for edge intersections with circle
-      for (let i = 0; i < corners.length; i++) {
-        const start = corners[i];
-        const end = corners[(i + 1) % corners.length];
-        const {distance2, pointOnLine, lineProj2, length2} = circle.properties.center.distanceToLine(start, end);
-        if (lineProj2 > 0 && lineProj2 < length2 && distance2 <= radius * radius) {
-          return true;
-        }
-      }
-
-      // check that the circle is not enclosed by the rectangle
-      const axes = [corners[3].minus(corners[0]), corners[3].minus(corners[2])];
-      const center0 = circle.properties.center.minus(corners[0]);
-      const center2 = circle.properties.center.minus(corners[2]);
-      const projections = [center0.project(axes[0]), center2.project(axes[1])];
-      const dots = [center0.dot(axes[0]), center2.dot(axes[1])];
-      if (dots[0] < 0 || projections[0].length2() > axes[0].length2() ||
-          dots[1] < 0 || projections[1].length2() > axes[1].length2()) {
-        return false;
-      }
-      return true;
+      if (corner.distance2(center) <= radius * radius) return true;
     }
+
+    // check for edge intersections with circle
+    for (let i = 0; i < corners.length; i++) {
+      const start = corners[i];
+      const end = corners[(i + 1) % corners.length];
+      const {distance2, pointOnLine, lineProj2, length2} = center.distanceToLine(start, end);
+      if (lineProj2 > 0 && lineProj2 < length2 && distance2 <= radius * radius) return true;
+    }
+
+    // check that the circle is not enclosed by the rectangle
+    const axes = [corners[3].minus(corners[0]), corners[3].minus(corners[2])];
+    const center0 = center.minus(corners[0]);
+    const center2 = center.minus(corners[2]);
+    const projections = [center0.project(axes[0]), center2.project(axes[1])];
+    const dots = [center0.dot(axes[0]), center2.dot(axes[1])];
+    if (dots[0] < 0 || projections[0].length2() > axes[0].length2() ||
+        dots[1] < 0 || projections[1].length2() > axes[1].length2()) {
+      return false;
+    }
+    return true;
   }
 
   rectPropsFromLine() {
@@ -171,7 +166,7 @@ export default class Collision {
       cornersA[3].minus(cornersA[2]),
       cornersB[0].minus(cornersB[1]),
       cornersB[0].minus(cornersB[3])
-    ]
+    ];
 
     // find axes with overlaps
     const overlaps = [];
@@ -187,7 +182,7 @@ export default class Collision {
       const [maxB, maxB_i] = util.maxAndIndex(positionsB);
       const [minB, minB_i] = util.minAndIndex(positionsB);
 
-      // if the rectangles don't overlaps on at least one axis, they don't collide
+      // if the rectangles don't overlap on at least one axis, they don't collide
       if (maxA < minB || maxB < minA) {
         return false;
       } else {
