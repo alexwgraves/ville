@@ -4,7 +4,7 @@ THREE.OrbitControls = require('three-orbitcontrols');
 const options = {};
 
 export function init() {
-  options.renderer = new THREE.WebGLRenderer();
+  options.renderer = new THREE.WebGLRenderer({antialias: true});
   // options.renderer.shadowMap.enabled = true;
   // options.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   options.renderer.setSize(window.innerWidth, window.innerHeight);
