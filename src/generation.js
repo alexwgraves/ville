@@ -15,6 +15,7 @@ import * as util from './util.js';
 import * as noise from './perlin.js';
 
 import Point from './classes/Point.js';
+import Polygon from './classes/Polygon.js';
 import Heatmap from './classes/Heatmap.js';
 import Segment from './classes/Segment.js';
 import Building from './classes/Building.js';
@@ -123,8 +124,8 @@ function globalGoals(previousSegment, color) {
     const continueStraight = templateContinue(previousSegment.direction());
     const straightPop = Heatmap.popOnRoad(continueStraight.road);
 
-    const F_ANGLE = color === 'skyscrapers' ? SKYSCRAPER_FORWARD_ANGLE : FORWARD_ANGLE;
-    const B_ANGLE = color === 'skyscrapers' ? SKYSCRAPER_BRANCH_ANGLE : BRANCH_ANGLE;
+    const F_ANGLE = color === Polygon.Type.SKYSCRAPERS ? SKYSCRAPER_FORWARD_ANGLE : FORWARD_ANGLE;
+    const B_ANGLE = color === Polygon.Type.SKYSCRAPERS ? SKYSCRAPER_BRANCH_ANGLE : BRANCH_ANGLE;
 
     if (previousSegment.params.highway) {
       const randomStraight = templateContinue(previousSegment.direction() + util.randomAngle(F_ANGLE));
@@ -188,7 +189,6 @@ export function generate(seed, color) {
   const segments = [];
   // TODO: bounds should be the bounding box of the polygon
   const treeParams = { x: seed.x, y: seed.y, width: HIGHWAY_SEGMENT_LENGTH, height: HIGHWAY_SEGMENT_LENGTH };
-  // TODO: maxObjects should vary based on the type of city area
   const tree = new QuadTree(treeParams, QUADTREE_MAX_OBJECTS, QUADTREE_MAX_LEVELS);
 
   while (queue.length && segments.length < SEGMENT_COUNT_LIMIT) {
@@ -224,8 +224,8 @@ export function generate(seed, color) {
   // building generation
   let buildings = [];
   segments.forEach(segment => {
-    const type = color === 'skyscrapers' ? Building.Type.SKYSCRAPER : Building.Type.RESIDENTIAL;
-    const count = color === 'skyscrapers' ? 5 : 10;
+    const type = color === Polygon.Type.SKYSCRAPERS ? Building.Type.SKYSCRAPER : Building.Type.RESIDENTIAL;
+    const count = color === Polygon.Type.SKYSCRAPERS ? 5 : 10;
     const newBuildings = BuildingFactory.aroundSegment(type, segment, count, 20, tree);
     newBuildings.forEach(building => tree.insert(building.collider.limits()));
     buildings = buildings.concat(newBuildings);

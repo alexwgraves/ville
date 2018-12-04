@@ -30,8 +30,6 @@ const options = {
   innerPoints: { skyscrapers: [], residential: [], commercial: [], water: [], parks: [] },
   polygons: [],
   polygonIndex: 0,
-  // other parameters
-  debugMode: false,
   scale: 20,
   segments: [],
   buildings: []
@@ -172,11 +170,7 @@ function interpretInput() {
   // detect edges for the last click
   const i = options.clickData[options.currentBrush].length - 1;
   if (i > -1) options.polygons.push(detectEdges(options.clickData[options.currentBrush][i], options.currentBrush));
-
-  for (const polygon of options.polygons) {
-    polygon.boundingBox(options);
-    polygon.scatterPoints(options);
-  }
+  options.polygons.forEach(polygon => polygon.boundingBox(options));
 }
 
 export function init(canvas, context) {
@@ -229,40 +223,21 @@ export function init(canvas, context) {
     currentBrushSize.innerText = brushSize.value;
   });
 
-  document.getElementById('debug').addEventListener('change', event => {
-    options.debugMode = event.target.checked;
-    document.getElementById('debug-controls').style.display = options.debugMode ? 'block' : 'none';
-  });
-
-  document.getElementById('edges').addEventListener('click', event => {
-    // DEBUG MODE: draw edge outlines
-    for (const polygon of options.polygons) {
-      for (const point of polygon.edges) {
-        context.fillStyle = '#000';
-        context.fillRect(point.x, point.y, 1, 1);
-      }
-    }
-  });
-
-  document.getElementById('analyze').addEventListener('click', event => {
-    // DEBUG MODE: draw bounding boxes and scatter points
-    interpretInput();
-    event.target.disabled = true;
-    event.target.classList.add('disabled');
-  });
-
   document.getElementById('generate').addEventListener('click', event => {
+    // disable generation button
+    event.target.classList.add('disabled');
+
     // detect edges for the last click
     const i = options.clickData[options.currentBrush].length - 1;
     if (i > -1) options.polygons.push(detectEdges(options.clickData[options.currentBrush][i], options.currentBrush));
 
     // create road networks seeded from each polygon
     options.polygons.forEach(polygon => {
-      if (polygon.color !== 'parks' && polygon.color !== 'water') {
+      if (polygon.color !== Polygon.Type.PARKS && polygon.color !== Polygon.Type.WATER) {
         // only generate roads for skyscrapers, commercial, and residential
         const { segments, buildings } = generator.generate(polygon.getCenter(options), polygon.color);
-        options.segments.push(segments);
-        options.buildings.push(buildings);
+        options.segments.push(...segments);
+        options.buildings.push(...buildings);
 
         // draw generation roads and building on map
         segments.forEach(segment => draw.drawSegment(options.context, segment));
@@ -273,8 +248,6 @@ export function init(canvas, context) {
 
   document.getElementById('3d').addEventListener('click', event => {
     scene.init();
-    for (let i = 0; i < options.segments.length; i++) {
-      scene.create(options.segments[i], options.buildings[i]);
-    }
+    scene.create(options.segments, options.buildings);
   });
 }

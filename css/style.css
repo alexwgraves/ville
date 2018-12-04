@@ -59,21 +59,12 @@ canvas {
 .button.disabled {
   border: 1px solid #999;
   color: #999;
+  cursor: not-allowed;
 }
 
 .button:hover:not(.disabled), .button:active:not(.disabled) {
   border: 1px solid #666;
   color: #666;
-}
-
-.debug-controls {
-  display: none;
-  margin-bottom: 10px;
-}
-
-.checkbox {
-  display: inline-block;
-  vertical-align: middle;
 }
 
 .skyscrapers {
