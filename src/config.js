@@ -25,3 +25,5 @@ export const QUADTREE_MAX_OBJECTS = 10;
 export const QUADTREE_MAX_LEVELS = 10;
 
 export const BUILDING_PLACEMENT_LOOP_LIMIT = 3;
+export const RESIDENTIAL_BUILDING_SIZE = 5;
+export const OTHER_BUILDING_SIZE = 8;

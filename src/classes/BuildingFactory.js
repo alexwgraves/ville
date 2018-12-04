@@ -1,4 +1,6 @@
-import { BUILDING_PLACEMENT_LOOP_LIMIT } from './../config.js';
+import { BUILDING_PLACEMENT_LOOP_LIMIT,
+         RESIDENTIAL_BUILDING_SIZE,
+         OTHER_BUILDING_SIZE } from './../config.js';
 import { randomRange } from './../util.js';
 
 import Building from './Building.js';
@@ -13,9 +15,9 @@ export default class BuildingFactory {
 
   static byType(type) {
     if (type === Building.Type.RESIDENTIAL) {
-      return new Building(new Point(0, 0), 0, 5, Building.Type.RESIDENTIAL);
+      return new Building(new Point(0, 0), 0, RESIDENTIAL_BUILDING_SIZE, Building.Type.RESIDENTIAL);
     } else {
-      return new Building(new Point(0, 0), 0, 8, Building.Type.OTHER, randomRange(0.5, 2));
+      return new Building(new Point(0, 0), 0, OTHER_BUILDING_SIZE, Building.Type.OTHER, randomRange(0.5, 2));
     }
   }
 
