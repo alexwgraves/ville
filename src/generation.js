@@ -17,6 +17,7 @@ import * as noise from './perlin.js';
 import Point from './classes/Point.js';
 import Heatmap from './classes/Heatmap.js';
 import Segment from './classes/Segment.js';
+import Building from './classes/Building.js';
 import QuadTree from './classes/QuadTree.js';
 import SegmentFactory from './classes/SegmentFactory.js';
 import BuildingFactory from './classes/BuildingFactory.js';
@@ -223,7 +224,9 @@ export function generate(seed, color) {
   // building generation
   let buildings = [];
   segments.forEach(segment => {
-    const newBuildings = BuildingFactory.aroundSegment(BuildingFactory.fromProbability, segment, 5, 40, tree);
+    const type = color === 'skyscrapers' ? Building.Type.SKYSCRAPER : Building.Type.RESIDENTIAL;
+    const count = color === 'skyscrapers' ? 5 : 10;
+    const newBuildings = BuildingFactory.aroundSegment(type, segment, count, 20, tree);
     newBuildings.forEach(building => tree.insert(building.collider.limits()));
     buildings = buildings.concat(newBuildings);
   });

@@ -1,6 +1,9 @@
 const THREE = require('three');
 THREE.OrbitControls = require('three-orbitcontrols');
 
+import { randomRange } from './util.js';
+import Building from './classes/Building.js';
+
 const options = {};
 
 export function init() {
@@ -51,10 +54,12 @@ export function create(segments, buildings) {
   const buildingMaterial = new THREE.MeshPhongMaterial({color: '#0000FF'});
   for (const building of buildings) {
     const side = building.diagonal / Math.sqrt(2); // TODO: make this respect aspectRatio
-    const height = side * (Math.random() + 1); // TODO: use perlin noise?
-    const buildingGeometry = new THREE.BoxGeometry(side, height, side);
-    const mesh = new THREE.Mesh(buildingGeometry, buildingMaterial);
+     // TODO: use perlin noise for height?
+    const height = building.type === Building.Type.SKYSCRAPER ? randomRange(side * 2, side * 6) : side + Math.random() * 2;
+    const geometry = new THREE.BoxGeometry(side, height, side);
+    const mesh = new THREE.Mesh(geometry, buildingMaterial);
     mesh.position.set(building.center.x - window.innerWidth / 2, height / 2, building.center.y - window.innerHeight / 2);
+    mesh.rotation.y = building.direction * Math.PI / 180;
     // mesh.castShadow = true;
     // mesh.receiveShadow = true;
     options.scene.add(mesh);
