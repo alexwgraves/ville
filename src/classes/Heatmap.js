@@ -1,4 +1,4 @@
-import * as noise from './../perlin.js';
+import * as noise from './../noise.js';
 
 export default class Heatmap {
   static populationAt(x, y) {

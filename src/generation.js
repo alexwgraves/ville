@@ -12,7 +12,7 @@ import { ROAD_SNAP_DISTANCE,
          QUADTREE_PARAMS, QUADTREE_MAX_OBJECTS, QUADTREE_MAX_LEVELS,
          SEGMENT_COUNT_LIMIT } from './config.js';
 import * as util from './util.js';
-import * as noise from './perlin.js';
+import * as noise from './noise.js';
 
 import Point from './classes/Point.js';
 import Polygon from './classes/Polygon.js';
@@ -173,10 +173,11 @@ function globalGoals(previousSegment, color) {
   return newBranches;
 }
 
-export function generate(seed, color) {
+export function generate(polygon) {
   noise.seed(Math.random());
 
   const queue = [];
+  const seed = polygon.getCenter();
   const rootSegment = new Segment(seed, new Point(seed.x + HIGHWAY_SEGMENT_LENGTH, seed.y), 0, { highway: true });
   const oppositeDirection = SegmentFactory.fromExisting(rootSegment);
   const newEnd = new Point(rootSegment.road.start.x - HIGHWAY_SEGMENT_LENGTH, oppositeDirection.road.end.y);
@@ -187,9 +188,7 @@ export function generate(seed, color) {
   queue.push(oppositeDirection);
 
   const segments = [];
-  // TODO: bounds should be the bounding box of the polygon
-  const treeParams = { x: seed.x, y: seed.y, width: HIGHWAY_SEGMENT_LENGTH, height: HIGHWAY_SEGMENT_LENGTH };
-  const tree = new QuadTree(treeParams, QUADTREE_MAX_OBJECTS, QUADTREE_MAX_LEVELS);
+  const tree = new QuadTree(polygon.bounds(), QUADTREE_MAX_OBJECTS, QUADTREE_MAX_LEVELS);
 
   while (queue.length && segments.length < SEGMENT_COUNT_LIMIT) {
     // pop smallest road from the priority queue (i.e. smallest time)
@@ -209,7 +208,7 @@ export function generate(seed, color) {
         minSegment.setUpBranchLinks();
       }
       minSegment.addSegment(segments, tree);
-      globalGoals(minSegment, color).forEach(segment => {
+      globalGoals(minSegment, polygon.color).forEach(segment => {
         segment.time += minSegment.time + 1;
         queue.push(segment);
       });
@@ -224,8 +223,8 @@ export function generate(seed, color) {
   // building generation
   let buildings = [];
   segments.forEach(segment => {
-    const type = color === Polygon.Type.SKYSCRAPERS ? Building.Type.SKYSCRAPER : Building.Type.RESIDENTIAL;
-    const count = color === Polygon.Type.SKYSCRAPERS ? 5 : 10;
+    const type = polygon.color === Polygon.Type.SKYSCRAPERS ? Building.Type.SKYSCRAPER : Building.Type.RESIDENTIAL;
+    const count = polygon.color === Polygon.Type.SKYSCRAPERS ? 5 : 10;
     const newBuildings = BuildingFactory.aroundSegment(type, segment, count, 20, tree);
     newBuildings.forEach(building => tree.insert(building.collider.limits()));
     buildings = buildings.concat(newBuildings);

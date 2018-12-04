@@ -76,7 +76,6 @@ export function create(segments, buildings) {
 
   function animate() {
   	requestAnimationFrame(animate);
-  	// required if controls.enableDamping or controls.autoRotate are set to true
   	options.controls.update();
   	options.renderer.render(options.scene, options.camera);
   }

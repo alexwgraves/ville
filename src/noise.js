@@ -102,7 +102,7 @@ export function simplex2(xin, yin) {
     n0 = t0 * t0 * gi0.dot2(x0, y0);  // (x,y) of grad3 used for 2D gradient
   }
   let t1 = 0.5 - x1 * x1 - y1 * y1;
-  if(t1 < 0) {
+  if (t1 < 0) {
     n1 = 0;
   } else {
     t1 *= t1;

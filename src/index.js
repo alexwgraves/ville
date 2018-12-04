@@ -1,7 +1,4 @@
-import Point from './classes/Point.js';
 import * as interaction from './interaction.js';
-import * as generator from './generation.js';
-import * as draw from './draw.js';
 
 // set up canvas and interaction
 const canvas = document.getElementById('canvas');

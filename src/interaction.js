@@ -105,7 +105,6 @@ function detectEdges(circle, color) {
   let y = circle.y;
 
   // find the rightmost pixel of this color
-  // TODO: do this better
   let currX = circle.x + circle.r - 1;
   let n = options.context.getImageData(currX++, y, 1, 1).data;
   while (n[0] == rgb[0] && n[1] == rgb[1] && n[2] == rgb[2]) {
@@ -164,13 +163,6 @@ function detectEdges(circle, color) {
 
   addEdge(start, start);
   return new Polygon(edges, color);
-}
-
-function interpretInput() {
-  // detect edges for the last click
-  const i = options.clickData[options.currentBrush].length - 1;
-  if (i > -1) options.polygons.push(detectEdges(options.clickData[options.currentBrush][i], options.currentBrush));
-  options.polygons.forEach(polygon => polygon.boundingBox(options));
 }
 
 export function init(canvas, context) {
@@ -235,7 +227,7 @@ export function init(canvas, context) {
     options.polygons.forEach(polygon => {
       if (polygon.color !== Polygon.Type.PARKS && polygon.color !== Polygon.Type.WATER) {
         // only generate roads for skyscrapers, commercial, and residential
-        const { segments, buildings } = generator.generate(polygon.getCenter(options), polygon.color);
+        const { segments, buildings } = generator.generate(polygon);
         options.segments.push(...segments);
         options.buildings.push(...buildings);
 
@@ -247,6 +239,9 @@ export function init(canvas, context) {
   });
 
   document.getElementById('3d').addEventListener('click', event => {
+    // disable render button
+    event.target.classList.add('disabled');
+
     scene.init();
     scene.create(options.segments, options.buildings);
   });
