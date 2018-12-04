@@ -3,6 +3,7 @@ import Circle from './classes/Circle.js';
 import Polygon from './classes/Polygon.js';
 import * as generator from './generation.js';
 import * as draw from './draw.js';
+import * as scene from './scene.js';
 
 const SUPPORTS_POINTER = 'PointerEvent' in window;
 const SUPPORTS_TOUCH = 'ontouchstart' in window;
@@ -31,7 +32,9 @@ const options = {
   polygonIndex: 0,
   // other parameters
   debugMode: false,
-  scale: 20 // TODO: make this chooseable?
+  scale: 20,
+  segments: [],
+  buildings: []
 }
 
 /* FUNCTIONS */
@@ -258,11 +261,20 @@ export function init(canvas, context) {
       if (polygon.color !== 'parks' && polygon.color !== 'water') {
         // only generate roads for skyscrapers, commercial, and residential
         const { segments, buildings } = generator.generate(polygon.getCenter(options), polygon.color);
+        options.segments.push(segments);
+        options.buildings.push(buildings);
 
         // draw generation roads and building on map
         segments.forEach(segment => draw.drawSegment(options.context, segment));
         buildings.forEach(building => draw.drawBuilding(options.context, building));
       }
     });
+  });
+
+  document.getElementById('3d').addEventListener('click', event => {
+    scene.init();
+    for (let i = 0; i < options.segments.length; i++) {
+      scene.create(options.segments[i], options.buildings[i]);
+    }
   });
 }
