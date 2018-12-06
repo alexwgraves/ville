@@ -21,6 +21,7 @@ export const MINIMUM_INTERSECTION_DEVIATION = 30; // in degrees
 export const MIN_SPEED_PROPORTION = 0.1;
 export const NORMAL_BRANCH_TIME_DELAY_FROM_HIGHWAY = 5;
 
+export const QUADTREE_PARAMS = { x: 0, y: 0, width: 1000, height: 1000 };
 export const QUADTREE_MAX_OBJECTS = 10;
 export const QUADTREE_MAX_LEVELS = 10;
 

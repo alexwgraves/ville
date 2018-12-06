@@ -1,5 +1,5 @@
 export function drawSegment(context, segment) {
-  context.strokeStyle = segment.params.highway ? '#FF0000' : '#000000';
+  context.strokeStyle = segment.params.deleted ? '#0000FF' : segment.params.highway ? '#FF0000' : '#000000';
   context.lineWidth = segment.width;
 
   context.beginPath();

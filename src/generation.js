@@ -19,7 +19,6 @@ import Polygon from './classes/Polygon.js';
 import Heatmap from './classes/Heatmap.js';
 import Segment from './classes/Segment.js';
 import Building from './classes/Building.js';
-import QuadTree from './classes/QuadTree.js';
 import SegmentFactory from './classes/SegmentFactory.js';
 import BuildingFactory from './classes/BuildingFactory.js';
 
@@ -29,6 +28,8 @@ function localConstraints(segment, segments, tree) {
   const matches = tree.retrieve(segment.collider.limits());
   for (const match of matches) {
     const other = match.object;
+    // only check local constraints for segments
+    if (!other.start) continue;
 
     // intersection check
     if (action.priority < 5) {
@@ -173,7 +174,7 @@ function globalGoals(previousSegment, color) {
   return newBranches;
 }
 
-export function generate(polygon) {
+export function generate(polygon, context, tree) {
   noise.seed(Math.random());
 
   const queue = [];
@@ -188,8 +189,6 @@ export function generate(polygon) {
   queue.push(oppositeDirection);
 
   const segments = [];
-  const tree = new QuadTree(polygon.bounds(), QUADTREE_MAX_OBJECTS, QUADTREE_MAX_LEVELS);
-
   while (queue.length && segments.length < SEGMENT_COUNT_LIMIT) {
     // pop smallest road from the priority queue (i.e. smallest time)
     let minT = queue[0].time;
@@ -208,10 +207,16 @@ export function generate(polygon) {
         minSegment.setUpBranchLinks();
       }
       minSegment.addSegment(segments, tree);
-      globalGoals(minSegment, polygon.color).forEach(segment => {
-        segment.time += minSegment.time + 1;
-        queue.push(segment);
-      });
+
+      // only add more segments if this segment ends within the polygon
+      const end = context.getImageData(minSegment.road.end.x, minSegment.road.end.y, 1, 1).data;
+      const rgb = Polygon.Color[polygon.color].slice(4, -1).split(',');
+      if (util.colorsEqual(end, rgb)) {
+        globalGoals(minSegment, polygon.color, context).forEach(segment => {
+          segment.time += minSegment.time + 1;
+          queue.push(segment);
+        });
+      }
     }
   }
 

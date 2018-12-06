@@ -39,3 +39,11 @@ export function maxAndIndex(array) {
   });
   return [max, max_i];
 }
+
+export function colorsEqual(a, b) {
+  return Math.abs(a[0] - b[0]) < 6 && Math.abs(a[1] - b[1]) < 6 && Math.abs(a[2] - b[2]) < 6;
+}
+
+export function colorsDifferent(a, b) {
+  return Math.abs(a[0] - b[0]) > 5 || Math.abs(a[1] - b[1]) > 5 || Math.abs(a[2] - b[2]) > 5;
+}

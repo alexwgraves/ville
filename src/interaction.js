@@ -1,9 +1,13 @@
 import Point from './classes/Point.js';
 import Circle from './classes/Circle.js';
 import Polygon from './classes/Polygon.js';
+import QuadTree from './classes/QuadTree.js';
 import * as generator from './generation.js';
 import * as draw from './draw.js';
 import * as scene from './scene.js';
+import { colorsEqual, colorsDifferent } from './util.js';
+
+import { QUADTREE_PARAMS, QUADTREE_MAX_OBJECTS, QUADTREE_MAX_LEVELS } from './config.js';
 
 const SUPPORTS_POINTER = 'PointerEvent' in window;
 const SUPPORTS_TOUCH = 'ontouchstart' in window;
@@ -138,18 +142,13 @@ function detectEdges(circle, color) {
     // check if any of the eight surrounding pixels are a different color
     const firstNot = neighbors.findIndex(p => {
       const pixel = options.context.getImageData(p.x, p.y, 1, 1).data;
-      return Math.abs(pixel[0] - rgb[0]) > 5 ||
-             Math.abs(pixel[1] - rgb[1]) > 5 ||
-             Math.abs(pixel[2] - rgb[2]) > 5;
+      return colorsDifferent(pixel, rgb);
     });
 
     // find the first neighbor that is the same color and not the previous point
     const firstSame = neighbors.findIndex(p => {
       const pixel = options.context.getImageData(p.x, p.y, 1, 1).data;
-      return (p.x !== prev.x || p.y !== prev.y) &&
-        Math.abs(pixel[0] - rgb[0]) < 6 &&
-        Math.abs(pixel[1] - rgb[1]) < 6 &&
-        Math.abs(pixel[2] - rgb[2]) < 6;
+      return (p.x !== prev.x || p.y !== prev.y) && colorsEqual(pixel, rgb);
     });
 
     if (firstNot !== -1) {
@@ -224,10 +223,11 @@ export function init(canvas, context) {
     if (i > -1) options.polygons.push(detectEdges(options.clickData[options.currentBrush][i], options.currentBrush));
 
     // create road networks seeded from each polygon
+    const tree = new QuadTree(QUADTREE_PARAMS, QUADTREE_MAX_OBJECTS, QUADTREE_MAX_LEVELS);
     options.polygons.forEach(polygon => {
       if (polygon.color !== Polygon.Type.PARKS && polygon.color !== Polygon.Type.WATER) {
         // only generate roads for skyscrapers, commercial, and residential
-        const { segments, buildings } = generator.generate(polygon);
+        const { segments, buildings } = generator.generate(polygon, options.context, tree);
         options.segments.push(...segments);
         options.buildings.push(...buildings);
 

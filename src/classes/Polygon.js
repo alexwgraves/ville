@@ -11,6 +11,16 @@ export default class Polygon {
     }
   }
 
+  static get Color() {
+    return {
+      skyscrapers: 'rgb(203,203,203)',
+      residential: 'rgb(252,139,148)',
+      commercial: 'rgb(191,140,190)',
+      water: 'rgb(180,207,226)',
+      parks: 'rgb(140,191,142)'
+    }
+  }
+
   constructor(edges, color) {
     this.edges = edges;
     this.color = color;
