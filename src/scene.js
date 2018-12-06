@@ -7,12 +7,12 @@ import Building from './classes/Building.js';
 const options = {};
 
 export function init() {
-  options.renderer = new THREE.WebGLRenderer({antialias: true});
+  const canvas3d = document.getElementById('scene');
+  canvas3d.style.zIndex = 5;
+  options.renderer = new THREE.WebGLRenderer({antialias: true, canvas: canvas3d});
+  options.renderer.setSize(window.innerWidth, window.innerHeight);
   // options.renderer.shadowMap.enabled = true;
   // options.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  options.renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(options.renderer.domElement);
-  window.scrollTo(0, window.innerHeight);
 
   options.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 5000);
   options.controls = new THREE.OrbitControls(options.camera);

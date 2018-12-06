@@ -212,7 +212,7 @@ export function generate(polygon, context, tree) {
       const end = context.getImageData(minSegment.road.end.x, minSegment.road.end.y, 1, 1).data;
       const rgb = Polygon.Color[polygon.color].slice(4, -1).split(',');
       if (util.colorsEqual(end, rgb)) {
-        globalGoals(minSegment, polygon.color, context).forEach(segment => {
+        globalGoals(minSegment, polygon.color).forEach(segment => {
           segment.time += minSegment.time + 1;
           queue.push(segment);
         });

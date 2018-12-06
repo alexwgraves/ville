@@ -35,9 +35,14 @@
           <button type="button" name="generate" class="button" id="generate">Generate City</button>
           <button type="button" name="3d" class="button" id="3d">Render in 3D</button>
         </div>
+        <button type="button" name="reset" class="button reset" id="reset">Reset</button>
       </div>
-      <canvas id="canvas"></canvas>
+      <div class="canvas">
+        <canvas id="interaction"></canvas>
+        <canvas id="map" class="map"></canvas>
+      </div>
     </div>
+    <canvas id="scene" class="three-d"></canvas>
 
     <script src="src/index.js" charset="utf-8"></script>
   </body>

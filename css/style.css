@@ -9,12 +9,24 @@ canvas {
   display: block;
 }
 
+.map {
+  position: absolute;
+  top: 0;
+  z-index: -1;
+}
+
+.three-d {
+  position: absolute;
+  top: 0;
+  z-index: -5;
+}
+
 .row {
   display: flex;
 }
 
 .column {
-  width: 15vw;
+  width: calc(15vw - 40px);
   height: calc(100vh - 40px);
   display: flex;
   flex-direction: column;
@@ -46,6 +58,7 @@ canvas {
 }
 
 .button {
+  width: 100%;
   display: block;
   margin: 0 0 5px 0;
   padding: 10px;
@@ -65,6 +78,10 @@ canvas {
 .button:hover:not(.disabled), .button:active:not(.disabled) {
   border: 1px solid #666;
   color: #666;
+}
+
+.reset {
+  margin-bottom: 0;
 }
 
 .skyscrapers {

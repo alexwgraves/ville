@@ -22,18 +22,9 @@ const options = {
   lastBrush: document.querySelector('.active').classList[1],
   currentSize: parseInt(document.getElementById('brush-size').value),
   brushes: Array.prototype.slice.call(document.getElementsByClassName('brush')),
-  brushColors: {
-    skyscrapers: 'rgb(203,203,203)',
-    residential: 'rgb(252,139,148)',
-    commercial: 'rgb(191,140,190)',
-    water: 'rgb(180,207,226)',
-    parks: 'rgb(140,191,142)'
-  },
   // data for storing canvas colors
   clickData: { skyscrapers: [], residential: [], commercial: [], water: [], parks: [] },
-  innerPoints: { skyscrapers: [], residential: [], commercial: [], water: [], parks: [] },
   polygons: [],
-  polygonIndex: 0,
   scale: 20,
   segments: [],
   buildings: []
@@ -43,7 +34,7 @@ const options = {
 
 function render() {
   for (let i = 0; i < options.xClicks.length; i++) {
-    options.context.strokeStyle = options.brushColors[options.currentBrush];
+    options.context.strokeStyle = Polygon.Color[options.currentBrush];
     options.context.lineWidth = options.currentSize;
 
     options.context.beginPath();
@@ -78,8 +69,8 @@ function onEventDown(event) {
   const i = options.clickData[options.lastBrush].length - 1;
   if (i > -1) options.polygons.push(detectEdges(options.clickData[options.lastBrush][i], options.lastBrush));
 
-  const mouseX = event.pageX - canvas.offsetLeft;
-  const mouseY = event.pageY - canvas.offsetTop;
+  const mouseX = event.pageX - options.canvas.offsetLeft;
+  const mouseY = event.pageY - options.canvas.offsetTop;
   options.drawing = true;
   addClick(mouseX, mouseY);
   render();
@@ -87,7 +78,7 @@ function onEventDown(event) {
 
 function onEventMove(event) {
   if (options.drawing) {
-    addClick(event.pageX - canvas.offsetLeft, event.pageY - canvas.offsetTop, true);
+    addClick(event.pageX - options.canvas.offsetLeft, event.pageY - options.canvas.offsetTop, true);
     render();
   }
 }
@@ -102,7 +93,7 @@ function onEventUp(event) {
 
 function detectEdges(circle, color) {
   const edges = [];
-  const rgb = options.brushColors[color].slice(4, -1).split(',');
+  const rgb = Polygon.Color[color].slice(4, -1).split(',');
 
   // start at the rightmost pixel of the circle
   let x = circle.x + circle.r - 1;
@@ -170,6 +161,11 @@ export function init(canvas, context) {
   options.canvas = canvas;
   options.context = context;
 
+  options.map = document.getElementById('map');
+  options.mapContext = options.map.getContext('2d');
+  options.map.width = window.innerWidth * 0.85; // canvas is 85vw
+  options.map.height = window.innerHeight;
+
   // brush logic
   const brushSize = document.getElementById('brush-size');
   const currentBrushSize = document.getElementById('current-brush-size');
@@ -178,26 +174,27 @@ export function init(canvas, context) {
 
   // update the canvas size on window resize
   window.addEventListener('resize', () => {
-    canvas.width = window.innerWidth * 0.85;
-    canvas.height = window.innerHeight;
+    options.context.lineJoin = 'round';
+    options.canvas.width = window.innerWidth * 0.85;
+    options.canvas.height = window.innerHeight;
     render();
   });
 
   if (SUPPORTS_POINTER) {
-    canvas.addEventListener('pointerdown', event => { onEventDown(event) });
-    canvas.addEventListener('pointermove', event => { onEventMove(event) });
-    canvas.addEventListener('pointerup', event => { onEventUp(event) });
-    canvas.addEventListener('pointercancel', event => { onEventUp(event) });
+    options.canvas.addEventListener('pointerdown', event => { onEventDown(event) });
+    options.canvas.addEventListener('pointermove', event => { onEventMove(event) });
+    options.canvas.addEventListener('pointerup', event => { onEventUp(event) });
+    options.canvas.addEventListener('pointercancel', event => { onEventUp(event) });
   } else if (SUPPORTS_TOUCH) {
-    canvas.addEventListener('touchstart', event => { onEventDown(event) });
-    canvas.addEventListener('touchmove', event => { onEventMove(event) });
-    canvas.addEventListener('touchend', event => { onEventUp(event) });
-    canvas.addEventListener('touchcancel', event => { onEventUp(event) });
+    options.canvas.addEventListener('touchstart', event => { onEventDown(event) });
+    options.canvas.addEventListener('touchmove', event => { onEventMove(event) });
+    options.canvas.addEventListener('touchend', event => { onEventUp(event) });
+    options.canvas.addEventListener('touchcancel', event => { onEventUp(event) });
   } else {
-    canvas.addEventListener('mousedown', event => { onEventDown(event) });
-    canvas.addEventListener('mousemove', event => { onEventMove(event) });
-    canvas.addEventListener('mouseup', event => { onEventUp(event) });
-    canvas.addEventListener('mouseleave', event => { onEventUp(event) });
+    options.canvas.addEventListener('mousedown', event => { onEventDown(event) });
+    options.canvas.addEventListener('mousemove', event => { onEventMove(event) });
+    options.canvas.addEventListener('mouseup', event => { onEventUp(event) });
+    options.canvas.addEventListener('mouseleave', event => { onEventUp(event) });
   }
 
   options.brushes.forEach(brush => {
@@ -214,9 +211,24 @@ export function init(canvas, context) {
     currentBrushSize.innerText = brushSize.value;
   });
 
+  document.getElementById('reset').addEventListener('click', event => {
+    options.clickData = { skyscrapers: [], residential: [], commercial: [], water: [], parks: [] };
+    options.polygons = [];
+    options.segments = [];
+    options.buildings = [];
+    options.canvas.style.zIndex = 1;
+    options.map.style.zIndex = '';
+    options.context.clearRect(0, 0, options.canvas.width, options.canvas.height);
+    options.mapContext.clearRect(0, 0, options.map.width, options.map.height);
+  });
+
   document.getElementById('generate').addEventListener('click', event => {
-    // disable generation button
-    event.target.classList.add('disabled');
+    // clear previous map and move map to the top
+    options.mapContext.clearRect(0, 0, options.map.width, options.map.height);
+    options.canvas.style.zIndex = 0;
+    options.map.style.zIndex = 1;
+    options.segments = [];
+    options.buildings = [];
 
     // detect edges for the last click
     const i = options.clickData[options.currentBrush].length - 1;
@@ -232,8 +244,8 @@ export function init(canvas, context) {
         options.buildings.push(...buildings);
 
         // draw generation roads and building on map
-        segments.forEach(segment => draw.drawSegment(options.context, segment));
-        buildings.forEach(building => draw.drawBuilding(options.context, building));
+        segments.forEach(segment => draw.drawSegment(options.mapContext, segment));
+        buildings.forEach(building => draw.drawBuilding(options.mapContext, building));
       }
     });
   });
