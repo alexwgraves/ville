@@ -3,6 +3,7 @@ THREE.OrbitControls = require('three-orbitcontrols');
 
 import { randomRange } from './util.js';
 import Building from './classes/Building.js';
+import Polygon from './classes/Polygon.js';
 
 const options = {};
 
@@ -32,7 +33,7 @@ export function init() {
   options.scene.add(new THREE.AmbientLight('#777'));
 }
 
-export function create(segments, buildings) {
+export function create(segments, buildings, polygons) {
   // highways and roads
   const highwayMaterial = new THREE.LineBasicMaterial({
     color: '#AA1E22',
@@ -61,6 +62,21 @@ export function create(segments, buildings) {
     mesh.position.set(building.center.x - window.innerWidth / 2, height / 2, building.center.y - window.innerHeight / 2);
     mesh.rotation.y = building.direction * Math.PI / 180;
     // mesh.castShadow = true;
+    // mesh.receiveShadow = true;
+    options.scene.add(mesh);
+  }
+
+  // water and parks
+  for (const polygon of polygons) {
+    const shape = new THREE.Shape();
+    const start = polygon.edges.shift();
+    shape.moveTo(start.x - window.innerWidth / 2, start.y - window.innerHeight / 2);
+    polygon.edges.forEach(point => shape.lineTo(point.x - window.innerWidth / 2, point.y - window.innerHeight / 2));
+
+    const geometry = new THREE.ShapeBufferGeometry(shape);
+    const material = new THREE.MeshPhongMaterial({ color: Polygon.Color[polygon.color], side: THREE.DoubleSide });
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.rotation.x = Math.PI / 2;
     // mesh.receiveShadow = true;
     options.scene.add(mesh);
   }

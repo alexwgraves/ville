@@ -246,6 +246,8 @@ export function init(canvas, context) {
         // draw generation roads and building on map
         segments.forEach(segment => draw.drawSegment(options.mapContext, segment));
         buildings.forEach(building => draw.drawBuilding(options.mapContext, building));
+      } else {
+        draw.drawPolygon(options.mapContext, polygon);
       }
     });
   });
@@ -255,6 +257,7 @@ export function init(canvas, context) {
     event.target.classList.add('disabled');
 
     scene.init();
-    scene.create(options.segments, options.buildings);
+    const polygons = options.polygons.filter(polygon => polygon.color === Polygon.Type.PARKS || polygon.color === Polygon.Type.WATER);
+    scene.create(options.segments, options.buildings, polygons);
   });
 }

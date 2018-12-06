@@ -1,5 +1,5 @@
 export function drawSegment(context, segment) {
-  context.strokeStyle = segment.params.deleted ? '#0000FF' : segment.params.highway ? '#FF0000' : '#000000';
+  context.strokeStyle = segment.params.highway ? '#FF0000' : '#000000';
   context.lineWidth = segment.width;
 
   context.beginPath();
@@ -11,7 +11,6 @@ export function drawSegment(context, segment) {
 
 export function drawBuilding(context, building) {
   context.fillStyle = 'rgba(0,0,0,0.2)';
-  // context.fillStyle = '#000000';
 
   context.beginPath();
   context.moveTo(building.corners[0].x, building.corners[0].y);
@@ -20,4 +19,14 @@ export function drawBuilding(context, building) {
   context.lineTo(building.corners[3].x, building.corners[3].y);
   context.closePath();
   context.fill();
+}
+
+export function drawPolygon(context, polygon) {
+  context.strokeStyle = '#000000';
+  context.lineWidth = 1;
+
+  context.beginPath();
+  polygon.edges.forEach(point => context.lineTo(point.x, point.y));
+  context.closePath();
+  context.stroke();
 }
