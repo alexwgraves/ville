@@ -48,6 +48,7 @@ function getTopVertices(corners, height, type) {
 export function init() {
   const canvas3d = document.getElementById('scene');
   canvas3d.style.zIndex = 5;
+  document.getElementById('controls').style.display = 'flex';
   options.renderer = new THREE.WebGLRenderer({antialias: true, canvas: canvas3d});
   options.renderer.setSize(window.innerWidth, window.innerHeight);
   options.renderer.shadowMap.enabled = true;

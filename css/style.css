@@ -9,6 +9,10 @@ canvas {
   display: block;
 }
 
+.canvas {
+  background-color: #FFFFFF;
+}
+
 .map {
   position: absolute;
   top: 0;
@@ -19,6 +23,18 @@ canvas {
   position: absolute;
   top: 0;
   z-index: -5;
+}
+
+.three-d-controls {
+  position: absolute;
+  right: 0;
+  width: calc(15vw - 40px);
+  height: calc(100vh - 40px);
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+  z-index: 10;
 }
 
 .row {

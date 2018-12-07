@@ -246,18 +246,31 @@ export function init(canvas, context) {
         // draw generation roads and building on map
         segments.forEach(segment => draw.drawSegment(options.mapContext, segment));
         buildings.forEach(building => draw.drawBuilding(options.mapContext, building));
-      } else {
-        draw.drawPolygon(options.mapContext, polygon);
       }
     });
   });
 
   document.getElementById('3d').addEventListener('click', event => {
-    // disable render button
+    // disable render and generate buttons
     event.target.classList.add('disabled');
+    document.getElementById('generate').classList.add('disabled');
 
     scene.init();
     const polygons = options.polygons.filter(polygon => polygon.color === Polygon.Type.PARKS || polygon.color === Polygon.Type.WATER);
     scene.create(options.segments, options.buildings, polygons);
+  });
+
+  document.getElementById('toggle').addEventListener('click', event => {
+    if (event.target.innerHTML.includes('Hide')) {
+      event.target.innerHTML = 'Show 3D';
+      document.getElementById('scene').style.zIndex = -5;
+    } else {
+      event.target.innerHTML = 'Hide 3D';
+      document.getElementById('scene').style.zIndex = 5;
+    }
+  });
+
+  document.getElementById('restart').addEventListener('click', event => {
+    location.reload();
   });
 }

@@ -20,13 +20,3 @@ export function drawBuilding(context, building) {
   context.closePath();
   context.fill();
 }
-
-export function drawPolygon(context, polygon) {
-  context.strokeStyle = '#000000';
-  context.lineWidth = 1;
-
-  context.beginPath();
-  polygon.edges.forEach(point => context.lineTo(point.x, point.y));
-  context.closePath();
-  context.stroke();
-}
