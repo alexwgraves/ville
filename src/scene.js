@@ -26,7 +26,7 @@ function getCornerVertices(corners, height) {
 }
 
 function getTopVertices(corners, height, type) {
-  // create a roof for residential buildings
+  // create a peaked roof for residential buildings
   if (type === Building.Type.RESIDENTIAL) {
     const midpoint = new Point(corners.reduce((acc, n) => acc + n.x, 0) / 4, corners.reduce((acc, n) => acc + n.y, 0) / 4);
     return [
@@ -91,9 +91,11 @@ export function create(segments, buildings, polygons) {
 
   // buildings
   for (const building of buildings) {
+    // adjust buildings corners to local origin
+    const corners = building.corners.map(corner => new Point(corner.x - window.innerWidth / 2, corner.y - window.innerHeight / 2));
     const side = building.diagonal * 2 / Math.sqrt(2);
     const height = building.type === Building.Type.SKYSCRAPER ? randomRange(side * 2, side * 6) : side + Math.random();
-    const corners = building.corners.map(corner => new Point(corner.x - window.innerWidth / 2, corner.y - window.innerHeight / 2));
+
     const geometry = new THREE.BufferGeometry();
     const vertices = new Float32Array([...getCornerVertices(corners, height), ...getTopVertices(corners, height, building.type)]);
     geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));

@@ -3,7 +3,7 @@ import Point from './Point.js';
 export default class Polygon {
   static get Type() {
     return {
-      SKYSCRAPERS: 'skyscrapers',
+      SKYSCRAPER: 'skyscraper',
       RESIDENTIAL: 'residential',
       COMMERCIAL: 'commercial',
       WATER: 'water',
@@ -13,7 +13,7 @@ export default class Polygon {
 
   static get Color() {
     return {
-      skyscrapers: 'rgb(203,203,203)',
+      skyscraper: 'rgb(203,203,203)',
       residential: 'rgb(252,139,148)',
       commercial: 'rgb(191,140,190)',
       water: 'rgb(180,207,226)',

@@ -23,7 +23,7 @@ const options = {
   currentSize: parseInt(document.getElementById('brush-size').value),
   brushes: Array.prototype.slice.call(document.getElementsByClassName('brush')),
   // data for storing canvas colors
-  clickData: { skyscrapers: [], residential: [], commercial: [], water: [], parks: [] },
+  clickData: { skyscraper: [], residential: [], commercial: [], water: [], parks: [] },
   polygons: [],
   scale: 20,
   segments: [],
@@ -212,7 +212,7 @@ export function init(canvas, context) {
   });
 
   document.getElementById('reset').addEventListener('click', event => {
-    options.clickData = { skyscrapers: [], residential: [], commercial: [], water: [], parks: [] };
+    options.clickData = { skyscraper: [], residential: [], commercial: [], water: [], parks: [] };
     options.polygons = [];
     options.segments = [];
     options.buildings = [];
@@ -238,7 +238,7 @@ export function init(canvas, context) {
     const tree = new QuadTree(QUADTREE_PARAMS, QUADTREE_MAX_OBJECTS, QUADTREE_MAX_LEVELS);
     options.polygons.forEach(polygon => {
       if (polygon.color !== Polygon.Type.PARKS && polygon.color !== Polygon.Type.WATER) {
-        // only generate roads for skyscrapers, commercial, and residential
+        // only generate roads for skyscraper, commercial, and residential
         const { segments, buildings } = generator.generate(polygon, options.context, tree);
         options.segments.push(...segments);
         options.buildings.push(...buildings);

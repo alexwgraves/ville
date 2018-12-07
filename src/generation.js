@@ -125,8 +125,8 @@ function globalGoals(previousSegment, color) {
     const continueStraight = templateContinue(previousSegment.direction());
     const straightPop = Heatmap.popOnRoad(continueStraight.road);
 
-    const F_ANGLE = color === Polygon.Type.SKYSCRAPERS ? SKYSCRAPER_FORWARD_ANGLE : FORWARD_ANGLE;
-    const B_ANGLE = color === Polygon.Type.SKYSCRAPERS ? SKYSCRAPER_BRANCH_ANGLE : BRANCH_ANGLE;
+    const F_ANGLE = color === Polygon.Type.SKYSCRAPER ? SKYSCRAPER_FORWARD_ANGLE : FORWARD_ANGLE;
+    const B_ANGLE = color === Polygon.Type.SKYSCRAPER ? SKYSCRAPER_BRANCH_ANGLE : BRANCH_ANGLE;
 
     if (previousSegment.params.highway) {
       const randomStraight = templateContinue(previousSegment.direction() + util.randomAngle(F_ANGLE));
@@ -228,9 +228,8 @@ export function generate(polygon, context, tree) {
   // building generation
   let buildings = [];
   segments.forEach(segment => {
-    const type = polygon.color === Polygon.Type.SKYSCRAPERS ? Building.Type.SKYSCRAPER : Building.Type.RESIDENTIAL;
-    const count = polygon.color === Polygon.Type.SKYSCRAPERS ? 5 : 10;
-    const newBuildings = BuildingFactory.aroundSegment(type, segment, count, 20, tree);
+    const count = polygon.color === Polygon.Type.SKYSCRAPER ? 5 : 10;
+    const newBuildings = BuildingFactory.aroundSegment(polygon.color, segment, count, 20, tree);
     newBuildings.forEach(building => tree.insert(building.collider.limits()));
     buildings = buildings.concat(newBuildings);
   });

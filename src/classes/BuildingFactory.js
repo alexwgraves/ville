@@ -9,9 +9,9 @@ import Point from './Point.js';
 export default class BuildingFactory {
   static byType(type) {
     if (type === Building.Type.SKYSCRAPER) {
-      return new Building(new Point(0, 0), 0, SKYSCRAPER_BUILDING_SIZE, Building.Type.SKYSCRAPER);
+      return new Building(new Point(0, 0), 0, SKYSCRAPER_BUILDING_SIZE, type);
     } else {
-      return new Building(new Point(0, 0), 0, RESIDENTIAL_BUILDING_SIZE, Building.Type.RESIDENTIAL, randomRange(0.5, 2));
+      return new Building(new Point(0, 0), 0, RESIDENTIAL_BUILDING_SIZE, type, randomRange(0.5, 2));
     }
   }
 

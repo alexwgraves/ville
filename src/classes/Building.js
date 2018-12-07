@@ -3,7 +3,11 @@ import Point from './Point.js';
 
 export default class Building {
   static get Type() {
-    return { RESIDENTIAL: 'residential', SKYSCRAPER: 'skyscraper' };
+    return {
+      RESIDENTIAL: 'residential',
+      COMMERCIAL: 'commercial',
+      SKYSCRAPER: 'skyscraper'
+    };
   }
 
   constructor(center, direction, diagonal, type, aspectRatio = 1) {
