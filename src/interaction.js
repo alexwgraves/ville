@@ -248,6 +248,9 @@ export function init(canvas, context) {
         buildings.forEach(building => draw.drawBuilding(options.mapContext, building));
       }
     });
+
+    // don't enable the render button until done generating
+    document.getElementById('3d').classList.remove('disabled');
   });
 
   document.getElementById('3d').addEventListener('click', event => {
