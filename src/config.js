@@ -1,5 +1,5 @@
-export const DEFAULT_SEGMENT_WIDTH = 1;
-export const HIGHWAY_SEGMENT_WIDTH = 2;
+export const DEFAULT_SEGMENT_WIDTH = 4;
+export const HIGHWAY_SEGMENT_WIDTH = 6;
 export const DEFAULT_SEGMENT_LENGTH = 25;
 export const HIGHWAY_SEGMENT_LENGTH = 30;
 export const SEGMENT_COUNT_LIMIT = 500;

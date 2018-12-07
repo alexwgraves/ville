@@ -1,6 +1,6 @@
 export function drawSegment(context, segment) {
   context.strokeStyle = segment.params.highway ? '#FF0000' : '#000000';
-  context.lineWidth = segment.width;
+  context.lineWidth = segment.params.highway ? 2 : 1;
 
   context.beginPath();
   context.moveTo(segment.road.start.x, segment.road.start.y);
