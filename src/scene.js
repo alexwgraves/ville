@@ -1,11 +1,49 @@
 const THREE = require('three');
 THREE.OrbitControls = require('three-orbitcontrols');
 
-import { randomRange } from './util.js';
+import { randomRange, randomColor } from './util.js';
 import Building from './classes/Building.js';
 import Polygon from './classes/Polygon.js';
+import Point from './classes/Point.js';
 
 const options = {};
+
+function getCornerVertices(corners, height) {
+  return [
+    // SIDE ONE
+    corners[0].x, 0, corners[0].y, corners[1].x, 0, corners[1].y, corners[1].x, height, corners[1].y,
+    corners[1].x, height, corners[1].y, corners[0].x, height, corners[0].y, corners[0].x, 0, corners[0].y,
+    // SIDE TWO
+    corners[1].x, 0, corners[1].y, corners[2].x, 0, corners[2].y, corners[2].x, height, corners[2].y,
+    corners[2].x, height, corners[2].y, corners[1].x, height, corners[1].y, corners[1].x, 0, corners[1].y,
+    // SIDE THREE
+    corners[2].x, 0, corners[2].y, corners[3].x, 0, corners[3].y, corners[3].x, height, corners[3].y,
+    corners[3].x, height, corners[3].y, corners[2].x, height, corners[2].y, corners[2].x, 0, corners[2].y,
+    // SIDE FOUR
+    corners[3].x, 0, corners[3].y, corners[0].x, 0, corners[0].y, corners[0].x, height, corners[0].y,
+    corners[0].x, height, corners[0].y, corners[3].x, height, corners[3].y, corners[3].x, 0, corners[3].y
+  ]
+}
+
+function getTopVertices(corners, height, type) {
+  // create a roof for residential buildings
+  if (type === Building.Type.RESIDENTIAL) {
+    const midpoint = new Point(corners.reduce((acc, n) => acc + n.x, 0) / 4, corners.reduce((acc, n) => acc + n.y, 0) / 4);
+    return [
+      // ROOF
+      corners[0].x, height, corners[0].y, corners[1].x, height, corners[1].y, midpoint.x, height + height / 3, midpoint.y,
+      corners[1].x, height, corners[1].y, corners[2].x, height, corners[2].y, midpoint.x, height + height / 3, midpoint.y,
+      corners[2].x, height, corners[2].y, corners[3].x, height, corners[3].y, midpoint.x, height + height / 3, midpoint.y,
+      corners[3].x, height, corners[3].y, corners[0].x, height, corners[0].y, midpoint.x, height + height / 3, midpoint.y
+    ]
+  } else {
+    return [
+      // TOP
+      corners[0].x, height, corners[0].y, corners[1].x, height, corners[1].y, corners[2].x, height, corners[2].y,
+      corners[2].x, height, corners[2].y, corners[3].x, height, corners[3].y, corners[0].x, height, corners[0].y
+    ]
+  }
+}
 
 export function init() {
   const canvas3d = document.getElementById('scene');
@@ -52,15 +90,15 @@ export function create(segments, buildings, polygons) {
   }
 
   // buildings
-  const buildingMaterial = new THREE.MeshPhongMaterial({color: '#0000FF'});
   for (const building of buildings) {
-    const side = building.diagonal / Math.sqrt(2); // TODO: make this respect aspectRatio
-     // TODO: use perlin noise for height?
-    const height = building.type === Building.Type.SKYSCRAPER ? randomRange(side * 2, side * 6) : side + Math.random() * 2;
-    const geometry = new THREE.BoxGeometry(side, height, side);
-    const mesh = new THREE.Mesh(geometry, buildingMaterial);
-    mesh.position.set(building.center.x - window.innerWidth / 2, height / 2, building.center.y - window.innerHeight / 2);
-    mesh.rotation.y = building.direction * Math.PI / 180;
+    const side = building.diagonal * 2 / Math.sqrt(2);
+    const height = building.type === Building.Type.SKYSCRAPER ? randomRange(side * 2, side * 6) : side + Math.random();
+    const corners = building.corners.map(corner => new Point(corner.x - window.innerWidth / 2, corner.y - window.innerHeight / 2));
+    const geometry = new THREE.BufferGeometry();
+    const vertices = new Float32Array([...getCornerVertices(corners, height), ...getTopVertices(corners, height, building.type)]);
+    geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
+    const material = new THREE.MeshPhongMaterial({color: randomColor(), side: THREE.DoubleSide });
+    const mesh = new THREE.Mesh(geometry, material);
     // mesh.castShadow = true;
     // mesh.receiveShadow = true;
     options.scene.add(mesh);

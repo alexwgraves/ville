@@ -2,6 +2,10 @@ export function randomRange(min, max) {
   return Math.random() * (max - min) + min;
 }
 
+export function randomColor(r = 256, g = 256, b = 256) {
+  return `rgb(${Math.floor(r * Math.random())}, ${Math.floor(g * Math.random())}, ${Math.floor(b * Math.random())})`;
+}
+
 export function minDegreeDifference(a, b) {
   const diff = Math.abs(a - b) % 180;
   return Math.min(diff, Math.abs(diff - 180));
