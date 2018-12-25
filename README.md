@@ -10,7 +10,7 @@ Ville uses [Parcel](https://parceljs.org) to bundle resources. For development, 
 
 Ville is deployed from the [`dist`](dist) folder. To ensure that `dist` has the correct resources, run `npm run build`. The most important distinction between this and `npm run dev` is that `build` sets the public URL to be `ville/[resource]`, which is necessary for my current URL structure.
 
-To deploy the `dist` folder, run `npm run deploy`. This pushes the `dist` folder to the `gh-pages` branch, where is the source branch for the published app.
+To deploy the `dist` folder, run `npm run deploy`. This pushes the `dist` folder to the `gh-pages` branch, which is the source branch for the published app.
 
 ## Credits
 The road generation and building placement implementations are adapted from [citygen](https://github.com/t-mw/citygen). The noise functions are adapted from [noisejs](https://github.com/josephg/noisejs).
