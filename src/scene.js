@@ -55,7 +55,7 @@ export function init() {
   options.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
   options.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 5000);
-  options.controls = new THREE.OrbitControls(options.camera);
+  options.controls = new THREE.OrbitControls(options.camera, options.renderer.domElement);
   options.camera.position.set(250, 250, 250);
   options.camera.lookAt(0, 0, 0);
   options.controls.minDistance = 1;
@@ -66,24 +66,25 @@ export function init() {
   options.scene.background = new THREE.Color().setHSL(0.6, 0, 1);
 	options.scene.fog = new THREE.Fog(scene.background, 1, 5000);
 
-  const hemisphere = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6);
+  // add hemisphere light for ambient lighting
+  const hemisphere = new THREE.HemisphereLight(0xffffff, 0x333333, 0.8);
   hemisphere.color.setRGB(50 / 255, 50 / 255, 50 / 255);
 	hemisphere.position.set(0, 50, 0);
 	options.scene.add(hemisphere);
 
-  const directional = new THREE.DirectionalLight(0xffffff, 1);
-  directional.color.setHSL(0.1, 1, 0.95);
-  directional.position.set(300, 250, 250);
-  options.scene.add(directional);
-  directional.castShadow = true;
-  directional.shadow.mapSize.width = 2048;
-  directional.shadow.mapSize.height = 2048;
-  directional.shadow.camera.left = -5;
-	directional.shadow.camera.right = 5;
-	directional.shadow.camera.top = 5;
-	directional.shadow.camera.bottom = -5;
-	directional.shadow.camera.far = 5000;
-	directional.shadow.bias = -0.0001;
+  // use point light for sun
+  const pointLight = new THREE.PointLight(0xe9f4f7, 0.6, 0, 2);
+  pointLight.position.set(256, 800, 256);
+  pointLight.castShadow = true;
+  pointLight.shadow.mapSize.width = 2048;
+  pointLight.shadow.mapSize.height = 2048;
+  pointLight.shadow.camera.left = -5;
+	pointLight.shadow.camera.right = 5;
+	pointLight.shadow.camera.top = 5;
+	pointLight.shadow.camera.bottom = -5;
+	pointLight.shadow.camera.far = 5000;
+	pointLight.shadow.bias = -0.0001;
+  options.scene.add(pointLight);
 }
 
 export function create(segments, buildings, polygons) {
@@ -97,16 +98,22 @@ export function create(segments, buildings, polygons) {
     const width = segment.width / 2;
 
     const geometry = new THREE.BufferGeometry();
+    const y = segment.params.highway ? 0.1 : 0.095;
     const vertices = new Float32Array([
-      start.x + Math.cos(radians + Math.PI) * width, 0.1, start.y + Math.sin(radians + Math.PI) * width,
-      start.x + Math.cos(radians) * width, 0.1, start.y + Math.sin(radians) * width,
-      end.x + Math.cos(radians) * width, 0.1, end.y + Math.sin(radians) * width,
-      end.x + Math.cos(radians) * width, 0.1, end.y + Math.sin(radians) * width,
-      end.x + Math.cos(radians + Math.PI) * width, 0.1, end.y + Math.sin(radians + Math.PI) * width,
-      start.x + Math.cos(radians + Math.PI) * width, 0.1, start.y + Math.sin(radians + Math.PI) * width
+      start.x + Math.cos(radians + Math.PI) * width, y, start.y + Math.sin(radians + Math.PI) * width,
+      start.x + Math.cos(radians) * width, y, start.y + Math.sin(radians) * width,
+      end.x + Math.cos(radians) * width, y, end.y + Math.sin(radians) * width,
+      end.x + Math.cos(radians) * width, y, end.y + Math.sin(radians) * width,
+      end.x + Math.cos(radians + Math.PI) * width, y, end.y + Math.sin(radians + Math.PI) * width,
+      start.x + Math.cos(radians + Math.PI) * width, y, start.y + Math.sin(radians + Math.PI) * width
     ]);
-    geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
+    geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+    // calculate geometry normals so lights will apply
+    geometry.computeFaceNormals();
+    geometry.computeVertexNormals();
+
     const mesh = new THREE.Mesh(geometry, segment.params.highway ? highway : road);
+    mesh.receiveShadow = true;
     options.scene.add(mesh);
   }
 
@@ -119,7 +126,7 @@ export function create(segments, buildings, polygons) {
 
     const geometry = new THREE.BufferGeometry();
     const vertices = new Float32Array([...getCornerVertices(corners, height), ...getTopVertices(corners, height, building.type)]);
-    geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
+    geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
     // calculate geometry normals so lights will apply
     geometry.computeFaceNormals();
     geometry.computeVertexNormals();
@@ -127,7 +134,7 @@ export function create(segments, buildings, polygons) {
     const material = new THREE.MeshLambertMaterial({ color: randomColor(), side: THREE.DoubleSide });
     const mesh = new THREE.Mesh(geometry, material);
     mesh.castShadow = true;
-    mesh.receiveShadow = true;
+    mesh.receiveShadow = false;
     options.scene.add(mesh);
   }
 
@@ -139,7 +146,7 @@ export function create(segments, buildings, polygons) {
     const material = new THREE.MeshPhongMaterial({ color: Polygon.Color[polygon.color], side: THREE.DoubleSide });
     const mesh = new THREE.Mesh(geometry, material);
     mesh.rotation.x = Math.PI / 2;
-    mesh.position.y = 0.1;
+    mesh.position.y = 0.09;
     mesh.receiveShadow = true;
     options.scene.add(mesh);
   }
