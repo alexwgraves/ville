@@ -18,8 +18,8 @@ const options = {
   yClicks: [],
   dragClicks: [],
   // brush parameters
-  currentBrush: document.querySelector('.active').classList[1],
-  lastBrush: document.querySelector('.active').classList[1],
+  currentBrush: document.querySelector('.active').getAttribute('data-type'),
+  lastBrush: document.querySelector('.active').getAttribute('data-type'),
   currentSize: parseInt(document.getElementById('brush-size').value),
   brushes: Array.prototype.slice.call(document.getElementsByClassName('brush')),
   // data for storing canvas colors
@@ -201,7 +201,7 @@ export function init(canvas, context) {
     brush.addEventListener('click', () => {
       clearActiveBrushes();
       options.lastBrush = options.currentBrush;
-      options.currentBrush = brush.classList[1];
+      options.currentBrush = brush.getAttribute('data-type');
       brush.classList.add('active');
     });
   });
