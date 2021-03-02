@@ -1,5 +1,5 @@
 const THREE = require('three');
-THREE.OrbitControls = require('three-orbitcontrols');
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 import { randomRange, randomColor } from './util.js';
 import Building from './classes/Building.js';
@@ -55,7 +55,7 @@ export function init() {
   options.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
   options.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 5000);
-  options.controls = new THREE.OrbitControls(options.camera, options.renderer.domElement);
+  options.controls = new OrbitControls(options.camera, options.renderer.domElement);
   options.camera.position.set(250, 250, 250);
   options.camera.lookAt(0, 0, 0);
   options.controls.minDistance = 1;

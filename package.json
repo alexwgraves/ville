@@ -2,17 +2,29 @@
   "name": "ville",
   "version": "1.1.0",
   "description": "A user input-based procedural city generator",
-  "main": "index.js",
   "scripts": {
-    "dev": "rm -rf dist/ && parcel watch index.html",
+    "dev": "rm -rf dist/ && parcel index.html",
     "build": "rm -rf dist/ && parcel build index.html --public-url='/ville'",
     "deploy": "git subtree push --prefix dist origin gh-pages"
   },
   "keywords": [],
   "author": "Alex Graves",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexwgraves/ville.git"
+  },
   "license": "ISC",
   "devDependencies": {
-    "parcel-bundler": "^1.12.4"
+    "@parcel/optimizer-cssnano": "^2.0.0-nightly.612",
+    "@parcel/optimizer-htmlnano": "^2.0.0-nightly.612",
+    "@parcel/packager-css": "^2.0.0-nightly.612",
+    "@parcel/packager-html": "^2.0.0-nightly.612",
+    "@parcel/transformer-css": "^2.0.0-nightly.612",
+    "@parcel/transformer-html": "^2.0.0-nightly.612",
+    "@parcel/transformer-postcss": "^2.0.0-nightly.612",
+    "@parcel/transformer-posthtml": "^2.0.0-nightly.612",
+    "parcel": "^2.0.0-beta.1",
+    "postcss": "^8.2.6"
   },
   "dependencies": {
     "src": "^1.1.2",

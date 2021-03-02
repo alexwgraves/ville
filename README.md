@@ -4,7 +4,7 @@ A user input-based procedural city generator, built for my Digital Media Design 
 
 ## Local Development
 
-Ville uses [Parcel](https://parceljs.org) to bundle resources. For development, run `npm run dev` to build and watch the CSS and JS. Then run `parcel index.html` in another terminal tab, and it will serve the app at `localhost:1234`. (You may need to run `npx parcel index.html` if the first command doesn't work.)
+Ville uses [Parcel](https://parceljs.org) to bundle resources. For development, run `npm run dev`, which will build, watch, and serve the app at `localhost:1234`. (You may need to run `npx parcel index.html` if the first command doesn't work.)
 
 ## Deploying
 
