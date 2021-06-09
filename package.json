@@ -15,19 +15,18 @@
   },
   "license": "ISC",
   "devDependencies": {
-    "@parcel/optimizer-cssnano": "^2.0.0-nightly.612",
-    "@parcel/optimizer-htmlnano": "^2.0.0-nightly.612",
+    "@parcel/optimizer-cssnano": "^2.0.0-nightly.716",
+    "@parcel/optimizer-htmlnano": "^2.0.0-nightly.716",
     "@parcel/packager-css": "^2.0.0-nightly.612",
     "@parcel/packager-html": "^2.0.0-nightly.612",
     "@parcel/transformer-css": "^2.0.0-nightly.612",
     "@parcel/transformer-html": "^2.0.0-nightly.612",
     "@parcel/transformer-postcss": "^2.0.0-nightly.612",
     "@parcel/transformer-posthtml": "^2.0.0-nightly.612",
-    "parcel": "^2.0.0-beta.1",
+    "parcel": "^2.0.0-nightly.714",
     "postcss": "^8.2.10"
   },
   "dependencies": {
-    "src": "^1.1.2",
     "three": "^0.125.0"
   }
 }
