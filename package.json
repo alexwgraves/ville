@@ -24,7 +24,7 @@
     "@parcel/transformer-postcss": "^2.0.0-nightly.612",
     "@parcel/transformer-posthtml": "^2.0.0-nightly.612",
     "parcel": "^2.0.0-beta.1",
-    "postcss": "^8.2.6"
+    "postcss": "^8.2.10"
   },
   "dependencies": {
     "src": "^1.1.2",
