@@ -16,14 +16,14 @@
   "license": "ISC",
   "devDependencies": {
     "@parcel/optimizer-cssnano": "^2.0.0-nightly.716",
-    "@parcel/optimizer-htmlnano": "^2.0.0-nightly.716",
-    "@parcel/packager-css": "^2.0.0-nightly.612",
-    "@parcel/packager-html": "^2.0.0-nightly.612",
-    "@parcel/transformer-css": "^2.0.0-nightly.612",
-    "@parcel/transformer-html": "^2.0.0-nightly.612",
-    "@parcel/transformer-postcss": "^2.0.0-nightly.612",
+    "@parcel/optimizer-htmlnano": "^2.8.2",
+    "@parcel/packager-css": "^2.8.2",
+    "@parcel/packager-html": "^2.8.2",
+    "@parcel/transformer-css": "^2.8.2",
+    "@parcel/transformer-html": "^2.8.2",
+    "@parcel/transformer-postcss": "^2.8.2",
     "@parcel/transformer-posthtml": "^2.0.0-nightly.612",
-    "parcel": "^2.0.0-nightly.714",
+    "parcel": "^2.8.2",
     "postcss": "^8.2.10"
   },
   "dependencies": {
